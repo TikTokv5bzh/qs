@@ -241,14 +241,14 @@
             display: none; /* إخفاء الحرف عند الإجابة */
         }
 
-        /* --- أزرار الفرق تحت الأحرف (الآن بجانب العنوان) --- */
+        /* --- أزرار الفرق الآن مكدسة فوق بعضها البعض --- */
         #team-buttons-area {
-            display: flex; /* لترتيب الأزرار أفقياً */
+            display: flex;
+            flex-direction: column; /* جعل الأزرار تظهر فوق بعضها البعض */
             justify-content: center;
             gap: 15px; /* مسافة بين الأزرار */
             flex-wrap: wrap; /* للسماح للأزرار بالانتقال لصف جديد على الشاشات الصغيرة */
             min-height: 50px; /* للحفاظ على المساحة حتى لو كانت الأزرار مخفية */
-            /* لا يوجد margin-top هنا، سيتم التحكم به بواسطة gap في game-title-and-buttons */
         }
         #team-buttons-area button {
             padding: 10px 20px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;
@@ -500,7 +500,7 @@
                 position: relative; left: auto; right: auto; top: auto; transform: none;
                 width: 95%; max-width: 300px; margin: 10px auto 0 auto; z-index: 5;
             }
-            #team-buttons-area { flex-direction: row; justify-content: center; margin-bottom: 0; }
+            #team-buttons-area { flex-direction: column; justify-content: center; margin-bottom: 0; }
         }
     </style>
 </head>
