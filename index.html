@@ -78,13 +78,56 @@
             margin-bottom: 30px; /* مسافة أسفل هذا الصف */
         }
 
-        #game-title-image {
-            max-width: 220px; height: auto;
-            margin-bottom: 0; /* إزالة الهامش السفلي السابق */
-            display: block;
-            margin-left: auto; /* إزالة التوسيط القديم */
-            margin-right: auto; /* إزالة التوسيط القديم */
-            flex-shrink: 0; /* منع الصورة من الانكماش */
+        /* أنماط نص العنوان الجديد */
+        #game-title-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* توسيط السطور أفقياً */
+            justify-content: center;
+            font-family: 'AA-galaxy', sans-serif;
+            line-height: 0.9; /* ضبط تباعد الأسطر */
+            flex-shrink: 0;
+            padding: 10px; /* إضافة بعض الحشوة */
+            transform: skewX(-10deg); /* تطبيق الميلان على الكتلة بأكملها */
+            max-width: 250px; /* تقييد العرض بشكل مشابه للصورة */
+            margin-bottom: 0;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #game-title-text span {
+            display: block; /* التأكد من أن كل سطر يأخذ سطرًا خاصًا به */
+            font-weight: bold;
+            text-shadow: 
+                -2px -2px 0 #333, 
+                2px -2px 0 #333, 
+                -2px 2px 0 #333, 
+                2px 2px 0 #333,
+                4px 4px 0 #555, /* ظل أعمق لتأثير ثلاثي الأبعاد */
+                6px 6px 0 #777; /* ظل أعمق */
+            white-space: nowrap; /* منع التفاف النص */
+            padding: 5px 0; /* إضافة حشوة رأسية للتباعد */
+            cursor: pointer; /* للإشارة إلى التفاعل */
+            transition: transform 0.2s ease;
+        }
+
+        #game-title-text span:hover {
+            transform: scale(1.05);
+        }
+
+        #title-line-1 {
+            font-size: 3.5rem; /* ضبط الحجم حسب الحاجة */
+            color: #FFD700; /* أصفر */
+        }
+
+        #title-line-2 {
+            font-size: 2.5rem; /* ضبط الحجم حسب الحاجة */
+            color: #4FC3F7; /* أزرق فاتح */
+        }
+
+        #title-line-3 {
+            font-size: 3.5rem; /* ضبط الحجم حسب الحاجة */
+            color: #EF5350; /* أحمر */
         }
 
         /* أزرار التحكم بالألوان */
@@ -302,7 +345,10 @@
         /* --- Responsive --- */
         @media (max-width: 900px) {
             :root { --hex-width: 50px; }
-            #game-title-image { max-width: 200px; margin-bottom: 20px; }
+            #game-title-text { max-width: 200px; }
+            #title-line-1 { font-size: 3rem; }
+            #title-line-2 { font-size: 2rem; }
+            #title-line-3 { font-size: 3rem; }
             #top-action-buttons-container { left: 15px; top: 15px; }
             .action-button-style { min-width: 120px; padding: 8px 15px; font-size: 0.9em;}
             #team-buttons-area { right: 15px; padding: 10px; }
@@ -312,6 +358,10 @@
         @media (max-width: 700px) {
             :root { --hex-width: 42px; }
             .cell-content { font-size: calc(var(--hex-width) * 0.48); }
+            #game-title-text { max-width: 180px; }
+            #title-line-1 { font-size: 2.5rem; }
+            #title-line-2 { font-size: 1.8rem; }
+            #title-line-3 { font-size: 2.5rem; }
             #top-action-buttons-container { left: 10px; top: 10px; }
             .action-button-style { min-width: 100px; padding: 7px 12px; font-size: 0.8em;}
             #team-buttons-area { right: 10px; padding: 8px; gap: 6px; }
@@ -321,7 +371,10 @@
             body { display: block; padding-top: 15px; }
             :root { --hex-width: 35px; }
             .cell-content { font-size: calc(var(--hex-width) * 0.5); }
-            #game-title-image { max-width: 150px; margin: 15px auto; }
+            #game-title-text { max-width: 150px; margin: 15px auto; }
+            #title-line-1 { font-size: 2rem; }
+            #title-line-2 { font-size: 1.5rem; }
+            #title-line-3 { font-size: 2rem; }
             #top-action-buttons-container, #team-buttons-area {
                 position: relative; left: auto; right: auto; top: auto; transform: none;
                 width: 95%; max-width: 300px; margin: 10px auto 0 auto; z-index: 5;
@@ -345,7 +398,10 @@
 
     <div id="game-content-wrapper">
         <div class="game-layout-row">
-            <img id="game-title-image" src="https://imgg.io/images/2025/05/05/image_d263e7.png" alt="لعبة خلايا النحل">
+            <div id="game-title-text">
+                <span id="title-line-1">حروف</span>
+                <span id="title-line-2">مع</span>
+                <span id="title-line-3">خبزة</span> </div>
             
             <div id="grid-layout-container">
                 <div id="grid-background"></div>
@@ -387,6 +443,8 @@
         const team2Class = 'answered-team2';
         const copyTextValue = "0271162329"; // الرقم المراد نسخه
         const questionsWebsiteUrl = "https://sahamstudio.com/horoof/questions.php"; // رابط موقع الأسئلة
+        const DEFAULT_PLAYER_NAME = "خبزة"; // الاسم الافتراضي
+        const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; // مفتاح التخزين المحلي
 
         // --- DOM Elements ---
         const loadingDiv = document.getElementById('loading');
@@ -396,7 +454,9 @@
         const winOverlay = document.getElementById('win-overlay');
         const winMessageText = document.getElementById('winMessageText');
         const restartButton = document.getElementById('restartButton');
-        const gameTitleImage = document.getElementById('game-title-image');
+        // تم إزالة gameTitleImage حيث تم استبدالها بنص
+        const gameTitleTextDiv = document.getElementById('game-title-text'); // عنصر النص الجديد
+        const titleLine3 = document.getElementById('title-line-3'); // السطر الثالث القابل للتخصيص
         
         // الزر المدمج
         const copyAndNavigateButton = document.getElementById('copyAndNavigateButton');
@@ -413,8 +473,18 @@
             winOverlay.classList.remove('visible'); // إخفاء رسالة الفوز
             gameIsOver = false;
 
-            // التأكد من تحميل صورة عنوان اللعبة
-            gameTitleImage.onerror = () => { console.warn("Game title image failed to load."); gameTitleImage.style.display = 'none'; };
+            // التأكد من أن عنصر النص مرئي
+            if (gameTitleTextDiv) {
+                gameTitleTextDiv.style.display = 'flex'; // التأكد من أنه مرئي
+            }
+
+            // تحميل اسم اللاعب من التخزين المحلي
+            loadPlayerName();
+
+            // إضافة مستمعي النقر المزدوج لجميع أسطر العنوان
+            document.querySelectorAll('#game-title-text span').forEach(span => {
+                span.addEventListener('dblclick', handleNameChangeDblClick);
+            });
 
             // تهيئة خلفية الشبكة
             updateGridBackground();
@@ -422,6 +492,30 @@
             populateGrid(); // إنشاء الشبكة
             showLoading(false); // إخفاء التحميل وإظهار الشبكة
             console.log("Grid populated. Ready.");
+        }
+
+        // دالة لتحميل اسم اللاعب من localStorage
+        function loadPlayerName() {
+            const savedName = localStorage.getItem(PLAYER_NAME_STORAGE_KEY);
+            titleLine3.innerText = savedName || DEFAULT_PLAYER_NAME;
+            console.log("Player name loaded:", titleLine3.innerText);
+        }
+
+        // دالة لمعالجة النقر المزدوج لتغيير الاسم
+        function handleNameChangeDblClick() {
+            const currentName = titleLine3.innerText;
+            const newName = prompt("أدخل اسمًا جديدًا:", currentName);
+
+            if (newName !== null && newName.trim() !== "") {
+                titleLine3.innerText = newName.trim();
+                localStorage.setItem(PLAYER_NAME_STORAGE_KEY, newName.trim());
+                console.log("Player name updated and saved:", newName.trim());
+            } else if (newName !== null) {
+                // المستخدم ضغط على موافق ولكنه أدخل سلسلة فارغة أو مسافات فقط
+                // لا يمكن استخدام alert() أو confirm() في بيئة Canvas، لذا يمكن إظهار رسالة داخل واجهة المستخدم
+                // أو تجاهل الإدخال الفارغ ببساطة. هنا سنقوم بتجاهله.
+                console.warn("تم إلغاء تغيير الاسم أو إدخال اسم فارغ.");
+            }
         }
 
         function showLoading(isLoading, message = "جاري التحميل...", isError = false) {
