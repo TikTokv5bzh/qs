@@ -13,8 +13,9 @@
         @font-face {
             font-family: 'AA-galaxy'; /* اسم الخط الصحيح */
             /*
-               تم تحديث الرابط لملف الخط مباشرة من مستودع GitHub الخاص بك.
-               هذا يجب أن يحل مشكلة تحميل الخط.
+               هام: هذا الرابط يجب أن يكون هو الرابط الفعلي لملف الخط المستضاف على GitHub Pages الخاص بك.
+               مثال: src: url('https://yourusername.github.io/your-repo-name/fonts/AA-GALAXY.otf') format('opentype');
+               تأكد من استبدال 'yourusername' و 'your-repo-name' بالقيم الصحيحة لمستودعك.
             */
             src: url('https://github.com/TikTokv5bzh/qs/raw/refs/heads/main/AA-GALAXY.otf') format('opentype');
             font-weight: normal;
@@ -52,7 +53,7 @@
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'AA-galaxy', 'Cairo', sans-serif; /* تطبيق الخط على جميع عناصر الجسم */
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; background-color: var(--color-bg); margin: 0; padding: 20px;
             position: relative; overflow-x: hidden; overflow-y: auto;
@@ -100,7 +101,7 @@
         .color-controls label {
             font-weight: bold;
             color: var(--color-text-dark);
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
 
         #grid-layout-container { /* الحاوية التي تحمل الشبكة والخلفية المثلثة */
@@ -174,7 +175,7 @@
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             font-weight: bold; user-select: none; text-align: center;
             color: var(--color-cell-text); /* لون النص أسود */
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط المخصص بقوة */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
             -webkit-text-stroke-width: 0; text-shadow: none;
         }
         .grid-cell.answered-team1, .grid-cell.answered-team2 { cursor: default; }
@@ -207,7 +208,7 @@
             padding: 10px 20px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;
             color: var(--color-text-light); font-weight: bold; transition: background-color 0.3s ease, opacity 0.3s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
         #team-buttons-area button:hover { opacity: 0.9; }
         #team-buttons-area .button-team1 { background-color: var(--color-team1); }
@@ -220,7 +221,7 @@
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 1.3em; text-align: center;
             padding: 15px 25px; color: var(--color-text-light); font-weight: bold; background-color: var(--color-win-message-bg);
             border-radius: 8px; z-index: 30; max-width: 90%; display: block;
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
         #loading.error-message { color: #FFCCCC; background-color: #8B0000; border: 1px solid #FFCCCC; }
         
@@ -236,13 +237,13 @@
             font-weight: bold;
             margin-bottom: 20px;
             animation: pulse 1.5s infinite;
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .restart-button {
             padding: 10px 20px; font-size: 1.2rem; background-color: #fff; color: #333;
             border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease;
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
         .restart-button:hover { background-color: #eee; }
 
@@ -272,7 +273,7 @@
             gap: 8px;
             width: auto; /* لجعل الأزرار تأخذ عرض المحتوى */
             min-width: 150px; /* حد أدنى للعرض */
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
         .action-button-style:hover {
             background-color: #45a049;
@@ -292,7 +293,7 @@
             color: white;
             white-space: nowrap;
             pointer-events: none; /* للسماح بالنقر على الزر من خلال الرسالة */
-            font-family: 'AA-galaxy', 'Cairo', sans-serif !important; /* تطبيق الخط هنا */
+            /* font-family: 'AA-galaxy', 'Cairo', sans-serif !important; */ /* تم إزالته، سيتورث من body */
         }
         .button-with-message-wrapper { /* لتغليف الزر والرسالة معاً للتموضع النسبي */
             position: relative;
@@ -635,7 +636,7 @@
         function announceWinner(winnerText, winnerClass) {
             if (gameIsOver) return;
             gameIsOver = true;
-            winMessageText.innerText = `🎉 ${winnerText} 🎉`;
+            winMessageText.innerText = `🎉 ${winnerText} �`;
             winOverlay.classList.add('visible'); // إظهار رسالة الفوز
             
             // جعل الخلايا غير الفائزة باهتة وغير قابلة للنقر
