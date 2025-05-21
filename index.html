@@ -42,9 +42,9 @@
             --hex-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
             /* --- تعديلات التداخل لخلايا النحل المتلاصقة --- */
-            --hex-margin-h: calc(var(--hex-width) * -0.25); /* تداخل أفقي للخلايا داخل الصف */
-            --hex-margin-v-overlap: calc(var(--hex-height) * -0.25); /* تداخل عمودي بين الصفوف */
-            --hex-stagger-offset: calc(var(--hex-width) * 0.75 / 2); /* إزاحة الصفوف الفردية */
+            --hex-margin-h: calc(var(--hex-width) * -0.1);
+            --hex-margin-v-overlap: calc(var(--hex-height) * -0.2);
+            --hex-stagger-offset: calc(var(--hex-width) * 0.75 / 2);
 
             --container-padding: 30px; /* للتباعد الداخلي للحاوية الرئيسية */
         }
@@ -152,7 +152,6 @@
             width: var(--hex-width);
             height: var(--hex-height);
             background-color: var(--color-cell-bg); /* أبيض غير شفاف */
-            border: 2px solid var(--color-hex-outer-border); /* حدود سوداء مرئية */
             cursor: pointer;
             clip-path: var(--hex-clip-path);
             display: flex;
