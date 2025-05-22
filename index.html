@@ -1,425 +1,951 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة حروف</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* CSS Styles */
+        /* تعريف الخط المخصص محلياً (المفضل من الكود الثاني) */
+        @font-face {
+            font-family: 'AA-galaxy';
+            src:
+                url('./AA-GALAXY.woff2') format('woff2'),
+                url('./AA-GALAXY.ttf') format('truetype'),
+                url('./AA-GALAXY.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap; /* لتحسين تجربة تحميل الخط */
+        }
+
+        :root {
+            /* --- الألوان --- */
+            --color-bg: #8B5CF6; /* بنفسجي */
+            --color-border-vertical: #34D399; /* أخضر */
+            --color-border-horizontal: #FB923C; /* برتقالي */
+            --color-cell-bg: #FFFFFF; /* أبيض غير شفاف */
+            --color-hex-outer-border: #333; /* لون حدود الخلية السداسية (أسود داكن) */
+            --color-cell-text: #000000; /* لون الحرف داخل الخلية (أسود) */
+            --color-team1: var(--color-border-vertical);
+            --color-team2: var(--color-border-horizontal);
+            --color-text-light: #FFFFFF;
+            --color-text-dark: #333333;
+            --color-question-area-bg: rgba(255, 255, 255, 0.95);
+            --color-button-area-bg: rgba(255, 255, 255, 0.95);
+            --color-win-message-bg: rgba(0, 0, 0, 0.75);
+
+            /* --- الأبعاد الأساسية للشكل السداسي --- */
+            --hex-width: 85px; /* عرض الخلية السداسية */
+            --hex-height: calc(var(--hex-width) * 0.8660254); /* ارتفاع الخلية السداسية المنتظمة */
+            --hex-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+
+            /* --- تعديلات التداخل لخلايا النحل المتلاصقة --- */
+            --hex-margin-h: calc(var(--hex-width) * -0.1);
+            --hex-margin-v-overlap: calc(var(--hex-height) * -0.2);
+            --hex-stagger-offset: calc(var(--hex-width) * 0.75 / 2);
+
+            --container-padding: 30px; /* للتباعد الداخلي للحاوية الرئيسية */
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط على جميع عناصر الجسم */
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; background-color: var(--color-bg); margin: 0; padding: 20px;
+            position: relative; overflow-x: hidden; overflow-y: auto;
+        }
+
+        #game-content-wrapper {
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; z-index: 1;
+            background-color: #FFFFFF; /* خلفية بيضاء للحاوية الرئيسية */
+            padding: var(--container-padding);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 100%; max-width: 1000px; /* زيادة أقصى عرض للسماح بالتخطيط الجانبي */
+            text-align: center;
+        }
+
+        /* حاوية جديدة للصورة والشبكة */
+        .game-layout-row {
+            display: flex;
+            flex-direction: row; /* تم تغيير الاتجاه ليصبح أفقياً: العنوان والأزرار بجانب الشبكة */
+            align-items: center; /* تم التوسيط عمودياً */
+            justify-content: center; /* توسيط المجموعة أفقياً */
+            gap: 30px; /* مسافة بين العناصر */
+            margin-bottom: 30px; /* مسافة أسفل هذا الصف */
+            flex-wrap: wrap; /* للسماح بالعناصر بالانتقال لصف جديد على الشاشات الصغيرة */
+        }
+
+        /* أنماط نص العنوان الجديد */
+        #game-title-and-buttons {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-            direction: rtl; /* For Arabic language */
+            align-items: center; /* توسيط العناصر داخل هذه الحاوية (العنوان والأزرار) */
+            gap: 15px; /* مسافة بين العنوان والأزرار */
+            flex-shrink: 0;
         }
 
-        h1 {
-            color: #333;
-        }
-
-        #game-container {
+        #game-title-text {
             display: flex;
-            gap: 20px;
-            align-items: flex-start; /* Align items to the top */
+            flex-direction: column;
+            align-items: center; /* توسيط السطور أفقياً */
+            justify-content: center;
+            font-family: 'AA-galaxy', sans-serif;
+            line-height: 0.9; /* ضبط تباعد الأسطر */
+            padding: 10px; /* إضافة بعض الحشوة */
+            transform: skewX(-10deg); /* تطبيق الميلان على الكتلة بأكملها */
+            max-width: 250px; /* تقييد العرض بشكل مشابه للصورة */
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        #crossword-grid {
-            display: grid;
-            /* Will be populated by JavaScript based on puzzle size */
-            /* Example: grid-template-columns: repeat(10, 30px); */
-            border: 2px solid #333;
-            background-color: #fff;
-            margin-bottom: 20px;
+        #game-title-text span {
+            display: block; /* التأكد من أن كل سطر يأخذ سطرًا خاصًا به */
+            font-weight: bold;
+            text-shadow: 
+                -2px -2px 0 #333, 
+                2px -2px 0 #333, 
+                -2px 2px 0 #333, 
+                2px 2px 0 #333,
+                4px 4px 0 #555, /* ظل أعمق لتأثير ثلاثي الأبعاد */
+                6px 6px 0 #777; /* ظل أعمق */
+            white-space: nowrap; /* منع التفاف النص */
+            padding: 5px 0; /* إضافة حشوة رأسية للتباعد */
+            cursor: pointer; /* للإشارة إلى التفاعل */
+            transition: transform 0.2s ease;
+        }
+
+        #game-title-text span:hover {
+            transform: scale(1.05);
+        }
+
+        #title-line-1 {
+            font-size: 3.5rem; /* ضبط الحجم حسب الحاجة */
+            color: #FFD700; /* أصفر */
+        }
+
+        #title-line-2 {
+            font-size: 2.5rem; /* ضبط الحجم حسب الحاجة */
+            color: #4FC3F7; /* أزرق فاتح */
+        }
+
+        #title-line-3 {
+            font-size: 3.5rem; /* ضبط الحجم حسب الحاجة */
+            color: #EF5350; /* أحمر */
+        }
+
+        /* أزرار التحكم بالألوان */
+        .color-controls {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .color-controls label {
+            font-weight: bold;
+            color: var(--color-text-dark);
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+
+        #grid-layout-container { /* الحاوية التي تحمل الشبكة والخلفية المثلثة */
+            position: relative;
+            padding: calc(var(--hex-height) * 0.75); /* لتوفير مساحة حول الشبكة نفسها */
+            width: fit-content;
+            margin: 0 auto;
+            border-radius: 15px; /* مطابقة للحاوية الرئيسية */
+            overflow: hidden; /* لإخفاء أي تداخل للخلفية */
+            flex-shrink: 0; /* منع الشبكة من الانكماش */
+        }
+
+        #grid-background { /* خلفية المثلثات */
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            /* Four triangles meeting at the center: Top/Bottom Green, Left/Right Orange */
+            background: conic-gradient(
+                from 45deg at 50% 50%, /* Start angle to align triangles */
+                var(--color-team2) 0deg 90deg,    /* Orange (Right) */
+                var(--color-team1) 90deg 180deg,   /* Green (Bottom) */
+                var(--color-team2) 180deg 270deg,  /* Orange (Left) */
+                var(--color-team1) 270deg 360deg   /* Green (Top) */
+            );
+            z-index: 0;
+            border-radius: 15px;
+        }
+
+        #hex-grid { /* شبكة الأشكال السداسية الفعلية */
+            display: flex;
+            flex-direction: column;
+            width: fit-content; /* لجعل العرض يتناسب مع الخلايا */
+            position: relative;
+            z-index: 1;
+            margin: 0 auto; /* لوسيط الشبكة داخل حاويتها */
+        }
+
+        .hex-row {
+            display: flex;
+            margin-bottom: var(--hex-margin-v-overlap); /* تداخل عمودي بين الصفوف */
+        }
+        .hex-row:last-child { margin-bottom: 0; }
+
+        .hex-row:nth-child(even) { /* الصفوف الزوجية (0, 2, 4...) تزيح لليمين لتأثير خلية النحل */
+            margin-inline-start: var(--hex-stagger-offset);
         }
 
         .grid-cell {
-            width: 35px; /* Cell width for PC */
-            height: 35px; /* Cell height for PC */
-            border: 1px solid #ccc;
-            text-align: center;
-            font-size: 18px; /* Font size for PC */
-            line-height: 35px; /* Vertically center text */
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
-            background-color: white; /* Default empty cell */
-            position: relative; /* For numbering */
-        }
-
-        .grid-cell.black {
-            background-color: black;
-        }
-
-        .grid-cell input {
-            width: 100%;
-            height: 100%;
-            border: none;
-            text-align: center;
-            font-size: inherit; /* Inherit font size from parent */
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-            outline: none; /* Remove focus outline */
-            background-color: transparent; /* Make input transparent over cell */
-        }
-
-        .cell-number {
-            position: absolute;
-            top: 1px;
-            left: 1px;
-            font-size: 9px;
-            color: #555;
-            line-height: 1;
-        }
-
-        #clues-container {
+            position: relative;
+            width: var(--hex-width);
+            height: var(--hex-height);
+            background-color: var(--color-cell-bg); /* أبيض غير شفاف */
+            cursor: pointer;
+            clip-path: var(--hex-clip-path);
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 300px; /* Width for clues section on PC */
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+            box-sizing: border-box; /* لضمان أن الحدود لا تزيد الحجم */
+            margin-right: var(--hex-margin-h); /* تداخل أفقي للخلايا داخل الصف */
+        }
+        .grid-cell:last-child { margin-right: 0; } /* آخر خلية في الصف لا تحتاج لتداخل أفقي */
+
+        .grid-cell:hover:not(.answered-team1):not(.answered-team2) {
+            transform: scale(1.08); z-index: 5;
+        }
+        .cell-content { /* محتوى الحرف داخل الخلية */
+            font-size: calc(var(--hex-width) * 0.45);
+            max-width: calc(var(--hex-width) * 0.75);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-weight: bold; user-select: none; text-align: center;
+            color: var(--color-cell-text); /* لون النص أسود */
+            font-family: 'AA-galaxy' !important; /* تطبيق الخط المخصص بقوة */
+        }
+        .grid-cell.answered-team1, .grid-cell.answered-team2 { cursor: default; }
+        .grid-cell.answered-team1:hover, .grid-cell.answered-team2:hover { transform: scale(1); }
+
+        .grid-cell.answered-team1 { /* خلية أجاب عليها الفريق الأول (الأخضر) */
+            background-color: var(--color-team1) !important;
+            border-color: var(--color-team1) !important;
+        }
+        .grid-cell.answered-team2 { /* خلية أجاب عليها الفريق الثاني (البرتقالي) */
+            background-color: var(--color-team2) !important;
+            border-color: var(--color-team2) !important;
+        }
+        .grid-cell.answered-team1 .cell-content,
+        .grid-cell.answered-team2 .cell-content {
+            color: var(--color-text-light) !important; /* لون النص أبيض في الخلايا المجاب عليها */
+            display: none; /* إخفاء الحرف عند الإجابة */
         }
 
-        .clue-section {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .clue-section h2 {
-            margin-top: 0;
-            font-size: 1.2em;
-            color: #555;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-
-        .clue-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .clue-list li {
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-
-        #controls {
-            margin-top: 20px;
+        /* --- أزرار الفرق الآن مكدسة فوق بعضها البعض --- */
+        #team-buttons-area {
             display: flex;
-            gap: 10px;
+            flex-direction: column; /* جعل الأزرار تظهر فوق بعضها البعض */
+            justify-content: center;
+            gap: 15px; /* مسافة بين الأزرار */
+            flex-wrap: wrap; /* للسماح للأزرار بالانتقال لصف جديد على الشاشات الصغيرة */
+            min-height: 50px; /* للحفاظ على المساحة حتى لو كانت الأزرار مخفية */
         }
+        #team-buttons-area button {
+            padding: 10px 20px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;
+            color: var(--color-text-light); font-weight: bold; transition: background-color 0.3s ease, opacity 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+        #team-buttons-area button:hover { opacity: 0.9; }
+        #team-buttons-area .button-team1 { background-color: var(--color-team1); }
+        #team-buttons-area .button-team2 { background-color: var(--color-team2); }
+        #team-buttons-area .button-cancel { background-color: #EF4444; /* أحمر */ }
 
-        #controls button {
-            padding: 10px 15px;
-            font-size: 1em;
-            background-color: #007bff;
+
+        /* --- شريط التحميل ورسالة الفوز --- */
+        #loading {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 1.3em; text-align: center;
+            padding: 15px 25px; color: var(--color-text-light); font-weight: bold; background-color: var(--color-win-message-bg);
+            border-radius: 8px; z-index: 30; max-width: 90%; display: block;
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+        #loading.error-message { color: #FFCCCC; background-color: #8B0000; border: 1px solid #FFCCCC; }
+        
+        #win-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #win-overlay.visible { opacity: 1; visibility: visible; }
+        .win-message-text {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .restart-button {
+            padding: 10px 20px; font-size: 1.2rem; background-color: #fff; color: #333;
+            border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease;
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+        .restart-button:hover { background-color: #eee; }
+
+        /* --- قسم الأزرار العلوية (نسخ وانتقال) --- */
+        #top-action-buttons-container { /* حاوية جديدة للأزرار العلوية */
+            position: fixed; /* لتثبيت الموقع */
+            left: 20px; /* على اليسار */
+            top: 20px; /* أعلى الشاشة */
+            z-index: 20;
+            display: flex;
+            flex-direction: column; /* الأزرار تحت بعضها */
+            gap: 10px; /* مسافة بين الأزرار */
+            align-items: flex-start; /* محاذاة لليسار */
+        }
+        .action-button-style { /* نمط عام للأزرار الجديدة */
+            padding: 10px 20px;
+            background-color: #4CAF50; /* لون أخضر افتراضي */
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 1rem;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: auto; /* لجعل الأزرار تأخذ عرض المحتوى */
+            min-width: 150px; /* حد أدنى للعرض */
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+        .action-button-style:hover {
+            background-color: #45a049;
+        }
+        .copy-message {
+            font-size: 0.9rem;
+            color: #4CAF50; /* أخضر للنجاح */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            position: absolute; /* لتموضع الرسالة تحت الزر */
+            left: 0; /* محاذاة لليسار */
+            top: 100%; /* تحت الزر مباشرة */
+            margin-top: 5px; /* مسافة إضافية */
+            background-color: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            white-space: nowrap;
+            pointer-events: none; /* للسماح بالنقر على الزر من خلال الرسالة */
+            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+        }
+        .button-with-message-wrapper { /* لتغليف الزر والرسالة معاً للتموضع النسبي */
+            position: relative;
+            width: auto; /* لجعل التغليف يتناسب مع عرض الزر */
+        }
+        .copy-message.visible {
+            opacity: 1;
         }
 
-        #controls button:hover {
-            background-color: #0056b3;
+        /* --- Custom Alert Box (Modal) Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* ليكون فوق كل شيء */
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
+        .modal-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* لمنع التفاعل عندما يكون مخفياً */
+        }
+
+        .modal-content {
+            background-color: #FFFFFF;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            font-family: 'AA-galaxy', sans-serif;
+        }
+
+        .modal-overlay.hidden .modal-content {
+            transform: translateY(-20px); /* تأثير حركة عند الإخفاء */
+        }
+
+        .modal-content h3 {
+            font-size: 1.8rem;
+            color: var(--color-text-dark);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal-content input[type="text"] {
+            width: calc(100% - 20px); /* عرض الحقل مع بعض الهامش */
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--color-team1); /* لون حدود جميل */
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+            font-family: 'AA-galaxy', sans-serif;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .modal-content input[type="text"]:focus {
+            border-color: var(--color-team2);
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3); /* ظل خفيف عند التركيز */
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-family: 'AA-galaxy', sans-serif;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-buttons button.confirm-btn {
+            background-color: var(--color-team1); /* أخضر */
+            color: white;
+        }
+
+        .modal-buttons button.confirm-btn:hover {
+            background-color: #28a77a; /* أخضر أغمق */
+            transform: translateY(-2px);
+        }
+
+        .modal-buttons button.cancel-btn {
+            background-color: #EF4444; /* أحمر */
+            color: white;
+        }
+
+        .modal-buttons button.cancel-btn:hover {
+            background-color: #dc2626; /* أحمر أغمق */
+            transform: translateY(-2px);
+        }
+
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            :root { --hex-width: 50px; }
+            #game-title-text { max-width: 200px; }
+            #title-line-1 { font-size: 3rem; }
+            #title-line-2 { font-size: 2rem; }
+            #title-line-3 { font-size: 3rem; }
+            #top-action-buttons-container { left: 15px; top: 15px; }
+            .action-button-style { min-width: 120px; padding: 8px 15px; font-size: 0.9em;}
+            #team-buttons-area { gap: 10px; }
+            #team-buttons-area button { min-width: 100px; padding: 7px 14px; font-size: 0.9em;}
+            .cell-content { font-size: calc(var(--hex-width) * 0.46); }
+        }
+        @media (max-width: 700px) {
+            :root { --hex-width: 42px; }
+            .cell-content { font-size: calc(var(--hex-width) * 0.48); }
+            #game-title-text { max-width: 180px; }
+            #title-line-1 { font-size: 2.5rem; }
+            #title-line-2 { font-size: 1.8rem; }
+            #title-line-3 { font-size: 2.5rem; }
+            #top-action-buttons-container { left: 10px; top: 10px; }
+            .action-button-style { min-width: 100px; padding: 7px 12px; font-size: 0.8em;}
+            #team-buttons-area { gap: 6px; }
+            #team-buttons-area button { min-width: 85px; padding: 6px 12px; font-size: 0.8em;}
+        }
+        @media (max-width: 550px) {
+            body { display: block; padding-top: 15px; }
+            :root { --hex-width: 35px; }
+            .cell-content { font-size: calc(var(--hex-width) * 0.5); }
+            /* في الشاشات الصغيرة جداً، اجعل العنوان والأزرار والشبكة تتكدس عمودياً */
+            .game-layout-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            #game-title-and-buttons {
+                width: 100%;
+                margin-bottom: 20px; /* مسافة إضافية قبل الشبكة */
+            }
+            #game-title-text { max-width: 150px; margin: 0 auto; }
+            #title-line-1 { font-size: 2rem; }
+            #title-line-2 { font-size: 1.5rem; }
+            #title-line-3 { font-size: 2rem; }
+            #top-action-buttons-container, #team-buttons-area {
+                position: relative; left: auto; right: auto; top: auto; transform: none;
+                width: 95%; max-width: 300px; margin: 10px auto 0 auto; z-index: 5;
+            }
+            #team-buttons-area { flex-direction: column; justify-content: center; margin-bottom: 0; }
+        }
     </style>
 </head>
 <body>
-    <h1>لعبة الكلمات المتقاطعة</h1>
 
-    <div id="game-container">
-        <div id="crossword-grid-container">
-            <div id="crossword-grid">
-                </div>
+    <div id="top-action-buttons-container">
+        <div class="button-with-message-wrapper">
+            <button id="copyAndNavigateButton" class="action-button-style">
+                <i class="far fa-copy"></i>
+                <i class="fas fa-external-link-alt"></i>
+                <span>نسخ وانتقال للأسئلة</span>
+            </button>
+            <span id="copyMessage" class="copy-message">تم النسخ!</span>
         </div>
+    </div>
 
-        <div id="clues-container">
-            <div class="clue-section">
-                <h2>الأفقي:</h2>
-                <ul id="across-clues" class="clue-list">
-                    </ul>
+    <div id="game-content-wrapper">
+        <div class="game-layout-row">
+            <div id="game-title-and-buttons">
+                <div id="game-title-text">
+                    <span id="title-line-1">حروف</span>
+                    <span id="title-line-2">مع</span>
+                    <span id="title-line-3">خبزة</span> </div>
+                <div id="team-buttons-area">
+                </div>
             </div>
-            <div class="clue-section">
-                <h2>العمودي:</h2>
-                <ul id="down-clues" class="clue-list">
-                    </ul>
+            
+            <div id="grid-layout-container">
+                <div id="grid-background"></div>
+                <div id="hex-grid"> </div>
+            </div>
+        </div>
+        
+        <div class="color-controls">
+            <div>
+                <label for="team1Color">الفريق الأول:</label>
+                <input type="color" id="team1Color" value="#34D399">
+            </div>
+            <div>
+                <label for="team2Color">الفريق الثاني:</label>
+                <input type="color" id="team2Color" value="#FB923C">
             </div>
         </div>
     </div>
 
-    <div id="controls">
-        <button id="check-button">تحقق من الإجابات</button>
-        <button id="reveal-letter-button">كشف حرف</button>
-        <button id="reveal-word-button">كشف كلمة</button>
-        <button id="reset-button">إعادة تعيين</button>
+    <div id="loading">جاري تحميل البيانات...</div>
+    <div id="win-overlay">
+        <div class="win-message-text" id="winMessageText"></div>
+        <button class="restart-button" id="restartButton">إعادة اللعب</button>
+    </div>
+
+    <div id="name-input-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>أدخل اسمك الجديد</h3>
+            <input type="text" id="playerNameInput" placeholder="اكتب اسمك هنا">
+            <div class="modal-buttons">
+                <button id="confirmNameBtn" class="confirm-btn">تأكيد</button>
+                <button id="cancelNameBtn" class="cancel-btn">إلغاء</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // JavaScript Code
-        document.addEventListener('DOMContentLoaded', function() {
-            const gridContainer = document.getElementById('crossword-grid');
-            const acrossCluesList = document.getElementById('across-clues');
-            const downCluesList = document.getElementById('down-clues');
+        // --- Configuration ---
+        const gridRows = 6; // 6 صفوف
+        const gridCols = 6; // 6 أعمدة
 
-            // تعريف بسيط للغز (كمثال)
-            // 1 = خلية سوداء, 0 = خلية بيضاء قابلة للكتابة
-            const puzzleLayout = [
-                [0, 0, 0, 1, 0],
-                [0, 1, 0, 1, 0],
-                [0, 0, 0, 0, 0],
-                [0, 1, 0, 1, 0],
-                [0, 0, 0, 1, 0]
-            ];
+        // --- Global State & Constants ---
+        let letters = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي"; // الحروف العربية
+        let currentClickedCellId = null;
+        let gameIsOver = false;
+        const team1Class = 'answered-team1';
+        const team2Class = 'answered-team2';
+        const copyTextValue = "0271162329"; // الرقم المراد نسخه
+        const questionsWebsiteUrl = "https://sahamstudio.com/horoof/questions.php"; // رابط موقع الأسئلة
+        const DEFAULT_PLAYER_NAME = "خبزة"; // الاسم الافتراضي
+        const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; // مفتاح التخزين المحلي
 
-            const puzzleData = {
-                across: [
-                    { number: 1, clue: "عاصمة فرنسا", answer: "باريس", row: 0, col: 0, length: 3 },
-                    { number: 3, clue: "حيوان أليف", answer: "قطة", row: 2, col: 0, length: 3},
-                    { number: 4, clue: "عكس كلمة 'تحت'", answer: "فوق", row: 4, col: 0, length: 3}
+        // --- DOM Elements ---
+        const loadingDiv = document.getElementById('loading');
+        const gridLayoutContainer = document.getElementById('grid-layout-container');
+        const hexGrid = document.getElementById('hex-grid');
+        const teamButtonsArea = document.getElementById('team-buttons-area');
+        const winOverlay = document.getElementById('win-overlay');
+        const winMessageText = document.getElementById('winMessageText');
+        const restartButton = document.getElementById('restartButton');
+        const gameTitleTextDiv = document.getElementById('game-title-text'); // عنصر النص الجديد
+        const titleLine3 = document.getElementById('title-line-3'); // السطر الثالث القابل للتخصيص
+        
+        // الزر المدمج
+        const copyAndNavigateButton = document.getElementById('copyAndNavigateButton');
+        const copyMessage = document.getElementById('copyMessage');
 
-                ],
-                down: [
-                    { number: 1, clue: "عاصمة مصر", answer: "قاهرة", row: 0, col: 0, length: 5 },
-                    { number: 2, clue: "لون السماء", answer: "ازرق", row: 0, col: 2, length: 5 }
-                ]
-            };
+        // عناصر مربع التنبيه المخصص
+        const nameInputModal = document.getElementById('name-input-modal');
+        const playerNameInput = document.getElementById('playerNameInput');
+        const confirmNameBtn = document.getElementById('confirmNameBtn');
+        const cancelNameBtn = document.getElementById('cancelNameBtn');
+
+        window.addEventListener('load', initialize);
+
+        function initialize() {
+            console.log("Initializing game (Honeycomb Layout, all features)...");
+            showLoading(true, "جاري تهيئة اللعبة...");
+            hexGrid.innerHTML = ''; // مسح الشبكة الحالية
+            hexGrid.style.display = 'none'; // إخفاء الشبكة مبدئياً
+            teamButtonsArea.style.display = 'none'; // إخفاء الأزرار مبدئياً
+            winOverlay.classList.remove('visible'); // إخفاء رسالة الفوز
+            nameInputModal.classList.add('hidden'); // إخفاء مربع التنبيه المخصص
+            gameIsOver = false;
+
+            // التأكد من أن عنصر النص مرئي
+            if (gameTitleTextDiv) {
+                gameTitleTextDiv.style.display = 'flex'; // التأكد من أنه مرئي
+            }
+
+            // تحميل اسم اللاعب من التخزين المحلي
+            loadPlayerName();
+
+            // إضافة مستمعي النقر المزدوج لجميع أسطر العنوان
+            document.querySelectorAll('#game-title-text span').forEach(span => {
+                span.addEventListener('dblclick', handleNameChangeDblClick);
+            });
+
+            // تهيئة خلفية الشبكة
+            updateGridBackground();
+
+            populateGrid(); // إنشاء الشبكة
+            showLoading(false); // إخفاء التحميل وإظهار الشبكة
+            console.log("Grid populated. Ready.");
+        }
+
+        // دالة لتحميل اسم اللاعب من localStorage
+        function loadPlayerName() {
+            const savedName = localStorage.getItem(PLAYER_NAME_STORAGE_KEY);
+            titleLine3.innerText = savedName || DEFAULT_PLAYER_NAME;
+            console.log("Player name loaded:", titleLine3.innerText);
+        }
+
+        // دالة لمعالجة النقر المزدوج لتغيير الاسم (تستخدم الآن مربع تنبيه مخصص)
+        function handleNameChangeDblClick() {
+            playerNameInput.value = titleLine3.innerText; // تعيين القيمة الحالية في حقل الإدخال
+            nameInputModal.classList.remove('hidden'); // إظهار مربع التنبيه المخصص
+            playerNameInput.focus(); // تركيز على حقل الإدخال
+        }
+
+        // مستمع لزر التأكيد في مربع التنبيه المخصص
+        confirmNameBtn.addEventListener('click', () => {
+            const newName = playerNameInput.value.trim();
+
+            if (newName !== "") {
+                titleLine3.innerText = newName;
+                localStorage.setItem(PLAYER_NAME_STORAGE_KEY, newName);
+                console.log("Player name updated and saved:", newName);
+            } else {
+                console.warn("تم إلغاء تغيير الاسم أو إدخال اسم فارغ.");
+            }
+            nameInputModal.classList.add('hidden'); // إخفاء مربع التنبيه
+        });
+
+        // مستمع لزر الإلغاء في مربع التنبيه المخصص
+        cancelNameBtn.addEventListener('click', () => {
+            nameInputModal.classList.add('hidden'); // إخفاء مربع التنبيه
+            console.log("تم إلغاء تغيير الاسم.");
+        });
 
 
-            const rows = puzzleLayout.length;
-            const cols = puzzleLayout[0].length;
-            gridContainer.style.gridTemplateColumns = `repeat(${cols}, 35px)`;
+        function showLoading(isLoading, message = "جاري التحميل...", isError = false) {
+            loadingDiv.innerText = message;
+            loadingDiv.style.display = isLoading ? 'block' : 'none';
+            if (isError) { loadingDiv.classList.add('error-message'); }
+            else { loadingDiv.classList.remove('error-message'); }
+            
+            if (!isLoading && !isError) {
+                hexGrid.style.display = 'flex'; // إظهار شبكة الأشكال السداسية
+            } else {
+                hexGrid.style.display = 'none'; // إخفاء شبكة الأشكال السداسية
+                teamButtonsArea.style.display = 'none'; // إخفاء الأزرار
+            }
+        }
 
-            let cellNumber = 1;
-            const numberedCells = {}; // لتخزين بداية الكلمات المرقمة
+        function populateGrid() {
+            hexGrid.innerHTML = '';
+            console.log(`Populating hex grid: ${gridRows}x${gridCols}`);
+            const shuffledLetters = shuffleArray(letters.split('')); // خلط الحروف
 
-            // إنشاء الشبكة والخلايا المرقمة
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
+            for (let r = 0; r < gridRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.classList.add('hex-row');
+                for (let c = 0; c < gridCols; c++) {
                     const cell = document.createElement('div');
                     cell.classList.add('grid-cell');
+                    cell.id = `cell-${r}-${c}`;
                     cell.dataset.row = r;
                     cell.dataset.col = c;
 
-                    if (puzzleLayout[r][c] === 1) {
-                        cell.classList.add('black');
-                    } else {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.maxLength = 1;
-                        input.dataset.row = r;
-                        input.dataset.col = c;
-                        // تحريك التركيز إلى الخلية التالية عند الكتابة
-                        input.addEventListener('input', (e) => {
-                            if (e.target.value.length === 1) {
-                                const nextInput = findNextInput(e.target);
-                                if (nextInput) nextInput.focus();
-                            }
-                        });
-                        input.addEventListener('keydown', (e) => handleKeyDown(e, input));
+                    const contentDiv = document.createElement('div');
+                    contentDiv.classList.add('cell-content');
+                    contentDiv.innerText = shuffledLetters[(r * gridCols + c) % shuffledLetters.length]; // تعيين حرف عشوائي
+                    cell.dataset.letter = contentDiv.innerText; // تخزين الحرف في dataset
+                    
+                    cell.appendChild(contentDiv);
+                    cell.addEventListener('click', handleCellClick);
+                    rowDiv.appendChild(cell);
+                }
+                hexGrid.appendChild(rowDiv);
+            }
+            console.log("Hex grid population complete.");
+        }
 
-                        cell.appendChild(input);
+        function handleCellClick(event) {
+            if (gameIsOver) {
+                // إذا انتهت اللعبة، عرض رسالة الفوز فقط
+                teamButtonsArea.innerHTML = "";
+                return;
+            }
+            const cell = event.currentTarget;
+            currentClickedCellId = cell.id;
+            teamButtonsArea.innerHTML = ''; // مسح الأزرار السابقة
+            teamButtonsArea.style.display = 'flex'; // إظهار منطقة الأزرار
 
-                        // ترقيم الخلايا لبداية الكلمات
-                        let isAcrossStart = (c === 0 || (puzzleLayout[r][c-1] === 1)) && (c + 1 < cols && puzzleLayout[r][c+1] === 0);
-                        let isDownStart = (r === 0 || (puzzleLayout[r-1][c] === 1)) && (r + 1 < rows && puzzleLayout[r+1][c] === 0);
+            if (cell.classList.contains(team1Class) || cell.classList.contains(team2Class)) {
+                // إذا كانت الخلية مجاب عليها، عرض زر الإلغاء فقط
+                const cancelButton = document.createElement('button');
+                cancelButton.className = 'button-cancel';
+                cancelButton.innerText = 'إلغاء الإجابة';
+                cancelButton.onclick = () => cancelAnswer();
+                teamButtonsArea.appendChild(cancelButton);
+            } else {
+                // إذا لم يتم الإجابة عليها، عرض أزرار اختيار الفريق
+                const btn1 = document.createElement('button');
+                btn1.className = 'button-team1';
+                btn1.innerText = 'الفريق الأول أجاب';
+                btn1.onclick = () => setUserChoice(team1Class);
+                const btn2 = document.createElement('button');
+                btn2.className = 'button-team2';
+                btn2.innerText = 'الفريق الثاني أجاب';
+                btn2.onclick = () => setUserChoice(team2Class);
+                teamButtonsArea.appendChild(btn1);
+                teamButtonsArea.appendChild(btn2);
+            }
+        }
 
-                        if(isAcrossStart || isDownStart) {
-                            const numberSpan = document.createElement('span');
-                            numberSpan.classList.add('cell-number');
-                            numberSpan.textContent = cellNumber;
-                            cell.appendChild(numberSpan);
-                            numberedCells[`${r}-${c}`] = cellNumber;
-                            cellNumber++;
-                        }
+        function setUserChoice(chosenTeamClass) {
+            if (!currentClickedCellId || gameIsOver) return;
+            const targetCell = document.getElementById(currentClickedCellId);
+            if (targetCell && !targetCell.classList.contains(team1Class) && !targetCell.classList.contains(team2Class)) {
+                targetCell.classList.add(chosenTeamClass);
+                targetCell.querySelector('.cell-content').style.display = 'none'; // إخفاء الحرف
+                checkWinCondition();
+                teamButtonsArea.innerHTML = ''; // إخفاء الأزرار بعد الاختيار
+                teamButtonsArea.style.display = 'none'; // إخفاء منطقة الأزرار
+            }
+            currentClickedCellId = null;
+        }
+
+        function cancelAnswer() {
+            if (!currentClickedCellId || gameIsOver) return;
+            const targetCell = document.getElementById(currentClickedCellId);
+            if (targetCell && (targetCell.classList.contains(team1Class) || targetCell.classList.contains(team2Class))) {
+                targetCell.classList.remove(team1Class, team2Class);
+                targetCell.querySelector('.cell-content').style.display = 'block'; // إظهار الحرف
+                teamButtonsArea.innerHTML = ''; // إخفاء الأزرار بعد الإلغاء
+                teamButtonsArea.style.display = 'none'; // إخفاء منطقة الأزرار
+            }
+            currentClickedCellId = null;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // دالة الحصول على الجيران (مهمة لشرط الفوز)
+        function getNeighbors(r, c) {
+            const neighbors = [];
+            const isEvenRow = (r % 2 === 0); // true if row index is even (0, 2, 4...)
+
+            let potentialNeighbors;
+            if (isEvenRow) { // الصفوف الزوجية (0, 2, 4..)
+                potentialNeighbors = [
+                    [r, c - 1], [r, c + 1],          // يسار، يمين
+                    [r - 1, c], [r - 1, c - 1],      // أعلى-يمين، أعلى-يسار
+                    [r + 1, c], [r + 1, c - 1]       // أسفل-يمين، أسفل-يسار
+                ];
+            } else { // الصفوف الفردية (1, 3, 5..)
+                potentialNeighbors = [
+                    [r, c - 1], [r, c + 1],          // يسار، يمين
+                    [r - 1, c + 1], [r - 1, c],      // أعلى-يمين، أعلى-يسار
+                    [r + 1, c + 1], [r + 1, c]       // أسفل-يمين، أسفل-يسار
+                ];
+            }
+
+            potentialNeighbors.forEach(([nr, nc]) => {
+                if (nr >= 0 && nr < gridRows && nc >= 0 && nc < gridCols) {
+                    const neighborId = `cell-${nr}-${nc}`;
+                    if (document.getElementById(neighborId)) { // التأكد من وجود الخلية
+                        neighbors.push(neighborId);
                     }
-                    gridContainer.appendChild(cell);
+                }
+            });
+            return neighbors;
+        }
+
+        function checkWinCondition() {
+            // الفريق الأول (Team 1) يحاول ربط الأعلى (الصف 0) بالأسفل (الصف gridRows-1)
+            if (checkForPath(team1Class, 'row')) {
+                announceWinner("الفريق الأول فاز!", team1Class);
+                return;
+            }
+            // الفريق الثاني (Team 2) يحاول ربط اليسار (العمود 0) باليمين (العمود gridCols-1)
+            if (checkForPath(team2Class, 'col')) {
+                announceWinner("الفريق الثاني فاز!", team2Class);
+                return;
+            }
+        }
+
+        function checkForPath(teamClass, dimension) {
+            const queue = [];
+            const visited = new Set();
+            let startCells = [];
+
+            if (dimension === 'row') { // ربط أعلى لأسفل (الفريق الأول)
+                for (let c_idx = 0; c_idx < gridCols; c_idx++) {
+                    const cell = document.getElementById(`cell-0-${c_idx}`); // خلايا الصف الأول
+                    if (cell && cell.classList.contains(teamClass)) {
+                        startCells.push(cell);
+                    }
+                }
+            } else { // ربط يسار ليمين (الفريق الثاني)
+                for (let r_idx = 0; r_idx < gridRows; r_idx++) {
+                    const cell = document.getElementById(`cell-${r_idx}-0`); // خلايا العمود الأول
+                    if (cell && cell.classList.contains(teamClass)) {
+                        startCells.push(cell);
+                    }
                 }
             }
 
-            // إضافة الأسئلة
-            puzzleData.across.forEach(clue => {
-                const listItem = document.createElement('li');
-                // العثور على الرقم الصحيح للخلية
-                const cellKey = `${clue.row}-${clue.col}`;
-                const displayNum = numberedCells[cellKey] || clue.number; // استخدام رقم السؤال إذا لم يكن مرقماً تلقائياً
-
-                listItem.textContent = `${displayNum}. ${clue.clue} (${clue.answer.length} حروف)`;
-                listItem.dataset.answer = clue.answer;
-                listItem.dataset.row = clue.row;
-                listItem.dataset.col = clue.col;
-                listItem.dataset.direction = 'across';
-                acrossCluesList.appendChild(listItem);
+            startCells.forEach(cell => {
+                if (!visited.has(cell.id)) {
+                    queue.push(cell);
+                    visited.add(cell.id);
+                }
             });
 
-            puzzleData.down.forEach(clue => {
-                const listItem = document.createElement('li');
-                const cellKey = `${clue.row}-${clue.col}`;
-                const displayNum = numberedCells[cellKey] || clue.number;
+            if (queue.length === 0) return false;
 
-                listItem.textContent = `${displayNum}. ${clue.clue} (${clue.answer.length} حروف)`;
-                listItem.dataset.answer = clue.answer;
-                listItem.dataset.row = clue.row;
-                listItem.dataset.col = clue.col;
-                listItem.dataset.direction = 'down';
-                downCluesList.appendChild(listItem);
+            while (queue.length > 0) {
+                const currentCell = queue.shift();
+                const r = parseInt(currentCell.dataset.row);
+                const c = parseInt(currentCell.dataset.col);
+
+                if (dimension === 'row' && r === gridRows - 1) return true; // وصل للصف الأخير
+                if (dimension === 'col' && c === gridCols - 1) return true; // وصل للعمود الأخير
+
+                const neighbors = getNeighbors(r, c);
+                neighbors.forEach(neighborId => {
+                    if (!visited.has(neighborId)) {
+                        const neighborCell = document.getElementById(neighborId);
+                        if (neighborCell && neighborCell.classList.contains(teamClass)) {
+                            visited.add(neighborId);
+                            queue.push(neighborCell);
+                        }
+                    }
+                }
+                );
+            }
+            return false;
+        }
+
+        function announceWinner(winnerText, winnerClass) {
+            if (gameIsOver) return;
+            gameIsOver = true;
+            winMessageText.innerText = `🎉 ${winnerText} 🎉`;
+            winOverlay.classList.add('visible'); // إظهار رسالة الفوز
+            
+            // جعل الخلايا غير الفائزة باهتة وغير قابلة للنقر
+            document.querySelectorAll('.grid-cell:not(.answered-team1):not(.answered-team2)')
+                .forEach(cell => { cell.style.opacity = '0.6'; cell.style.cursor = 'not-allowed'; });
+            
+            teamButtonsArea.innerHTML = ''; // مسح الأزرار
+            teamButtonsArea.style.display = 'none'; // إخفاء منطقة الأزرار
+        }
+
+        // --- Event Listeners for Color Pickers ---
+        document.getElementById('team1Color').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--color-team1', e.target.value);
+            document.querySelectorAll('.grid-cell.answered-team1').forEach(cell => {
+                cell.style.backgroundColor = e.target.value;
+                cell.style.borderColor = e.target.value;
             });
-
-            // وظائف الأزرار (تحتاج إلى تفصيل أكثر)
-            document.getElementById('check-button').addEventListener('click', checkAnswers);
-            document.getElementById('reveal-letter-button').addEventListener('click', () => revealHint('letter'));
-            document.getElementById('reveal-word-button').addEventListener('click', () => revealHint('word'));
-            document.getElementById('reset-button').addEventListener('click', resetGrid);
-
-            function findNextInput(currentInput) {
-                // هذه دالة بسيطة، يمكن تحسينها لتتبع اتجاه الكتابة (أفقي/عمودي)
-                const allInputs = Array.from(gridContainer.querySelectorAll('input'));
-                const currentIndex = allInputs.indexOf(currentInput);
-                if (currentIndex !== -1 && currentIndex + 1 < allInputs.length) {
-                    return allInputs[currentIndex + 1];
-                }
-                return null;
-            }
-
-            function handleKeyDown(event, inputElement) {
-                const row = parseInt(inputElement.dataset.row);
-                const col = parseInt(inputElement.dataset.col);
-                let nextRow = row;
-                let nextCol = col;
-
-                switch (event.key) {
-                    case 'ArrowUp':
-                        nextRow = Math.max(0, row - 1);
-                        event.preventDefault();
-                        break;
-                    case 'ArrowDown':
-                        nextRow = Math.min(rows - 1, row + 1);
-                        event.preventDefault();
-                        break;
-                    case 'ArrowLeft':
-                        nextCol = Math.max(0, col - 1);
-                        event.preventDefault();
-                        break;
-                    case 'ArrowRight':
-                        nextCol = Math.min(cols - 1, col + 1);
-                        event.preventDefault();
-                        break;
-                    case 'Backspace':
-                        if (inputElement.value === '') {
-                            const prevInput = findPrevInput(inputElement);
-                            if (prevInput) {
-                                prevInput.focus();
-                                prevInput.value = ''; // مسح قيمة الخلية السابقة أيضًا عند الرجوع
-                            }
-                            event.preventDefault();
-                        }
-                        return; // لا تنقل التركيز تلقائيًا عند المسح داخل الخلية
-                    default:
-                        return; // لا تفعل شيئًا للمفاتيح الأخرى
-                }
-
-                const nextCell = gridContainer.querySelector(`input[data-row='${nextRow}'][data-col='${nextCol}']`);
-                if (nextCell && !nextCell.parentElement.classList.contains('black')) {
-                    nextCell.focus();
-                }
-            }
-             function findPrevInput(currentInput) {
-                const allInputs = Array.from(gridContainer.querySelectorAll('input:not([disabled]))')); // تجاهل الخلايا المعطلة
-                const currentIndex = allInputs.indexOf(currentInput);
-                if (currentIndex > 0) {
-                    return allInputs[currentIndex - 1];
-                }
-                return null;
-            }
-
-
-            function checkAnswers() {
-                console.log("التحقق من الإجابات...");
-                let allCorrect = true;
-
-                puzzleData.across.forEach(clue => {
-                    let userAnswer = "";
-                    for (let i = 0; i < clue.length; i++) {
-                        const cellInput = gridContainer.querySelector(`input[data-row='${clue.row}'][data-col='${clue.col + i}']`);
-                        if (cellInput) {
-                            userAnswer += cellInput.value.toUpperCase(); // توحيد حالة الأحرف للمقارنة
-                        }
-                    }
-                    if (userAnswer.toLowerCase() === clue.answer.toLowerCase()) {
-                        // يمكنك إضافة تنسيق للإجابة الصحيحة هنا
-                        console.log(`Across Clue ${clue.number} (${clue.answer}): Correct!`);
-                         for (let i = 0; i < clue.length; i++) {
-                            const cellInput = gridContainer.querySelector(`input[data-row='${clue.row}'][data-col='${clue.col + i}']`);
-                            if(cellInput) cellInput.style.backgroundColor = '#d4edda'; // أخضر فاتح
-                        }
-                    } else {
-                        allCorrect = false;
-                        console.log(`Across Clue ${clue.number} (${clue.answer}): Incorrect. You entered: ${userAnswer}`);
-                         for (let i = 0; i < clue.length; i++) {
-                            const cellInput = gridContainer.querySelector(`input[data-row='${clue.row}'][data-col='${clue.col + i}']`);
-                             if(cellInput && cellInput.value !== '') cellInput.style.backgroundColor = '#f8d7da'; // أحمر فاتح
-                        }
-                    }
-                });
-
-                puzzleData.down.forEach(clue => {
-                    let userAnswer = "";
-                    for (let i = 0; i < clue.length; i++) {
-                        const cellInput = gridContainer.querySelector(`input[data-row='${clue.row + i}'][data-col='${clue.col}']`);
-                        if (cellInput) {
-                            userAnswer += cellInput.value.toUpperCase();
-                        }
-                    }
-                     if (userAnswer.toLowerCase() === clue.answer.toLowerCase()) {
-                        console.log(`Down Clue ${clue.number} (${clue.answer}): Correct!`);
-                        for (let i = 0; i < clue.length; i++) {
-                            const cellInput = gridContainer.querySelector(`input[data-row='${clue.row + i}'][data-col='${clue.col}']`);
-                             if(cellInput) cellInput.style.backgroundColor = '#d4edda';
-                        }
-                    } else {
-                        allCorrect = false;
-                        console.log(`Down Clue ${clue.number} (${clue.answer}): Incorrect. You entered: ${userAnswer}`);
-                        for (let i = 0; i < clue.length; i++) {
-                            const cellInput = gridContainer.querySelector(`input[data-row='${clue.row + i}'][data-col='${clue.col}']`);
-                            if(cellInput && cellInput.value !== '') cellInput.style.backgroundColor = '#f8d7da';
-                        }
-                    }
-                });
-
-                if(allCorrect) {
-                    alert("رائع! لقد أجبت على جميع الأسئلة بشكل صحيح!");
-                } else {
-                    alert("بعض الإجابات غير صحيحة. حاول مرة أخرى!");
-                }
-            }
-
-            function revealHint(type) {
-                // هذه وظيفة مبسطة لكشف الحرف/الكلمة (تحتاج إلى اختيار السؤال أولاً)
-                alert(`وظيفة "${type === 'letter' ? 'كشف حرف' : 'كشف كلمة'}" لم تبرمج بالكامل بعد.`);
-                // كمثال: يمكن أن تختار أول كلمة خاطئة أو سؤال محدد من قبل المستخدم
-                // وتكشف حرفًا منها أو الكلمة بأكملها.
-            }
-
-            function resetGrid() {
-                console.log("إعادة تعيين اللوحة...");
-                const inputs = gridContainer.querySelectorAll('input');
-                inputs.forEach(input => {
-                    input.value = '';
-                    input.style.backgroundColor = 'transparent'; // إعادة لون الخلفية
-                    input.disabled = false; // تفعيل الإدخال إذا كان معطلاً
-                });
-                // إعادة ضبط ألوان الأسئلة إذا تم تغييرها
-                document.querySelectorAll('#across-clues li, #down-clues li').forEach(li => {
-                    li.style.textDecoration = 'none';
-                    li.style.color = 'inherit';
-                });
-                alert("تم إعادة تعيين اللوحة.");
-            }
+            updateGridBackground(); // تحديث خلفية الشبكة
         });
+
+        document.getElementById('team2Color').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--color-team2', e.target.value);
+            document.querySelectorAll('.grid-cell.answered-team2').forEach(cell => {
+                cell.style.backgroundColor = e.target.value;
+                cell.style.borderColor = e.target.value;
+            });
+            updateGridBackground(); // تحديث خلفية الشبكة
+        });
+        
+        // دالة لتحديث خلفية الشبكة (تستدعى عند التهيئة وتغيير اللون)
+        function updateGridBackground() {
+            document.getElementById('grid-background').style.background = `
+                conic-gradient(
+                    from 45deg at 50% 50%, /* Start angle to align triangles */
+                    var(--color-team2) 0deg 90deg,    /* Orange (Right) */
+                    var(--color-team1) 90deg 180deg,   /* Green (Bottom) */
+                    var(--color-team2) 180deg 270deg,  /* Orange (Left) */
+                    var(--color-team1) 270deg 360deg   /* Green (Top) */
+                )
+            `;
+        }
+
+        // مستمع حدث لزر إعادة اللعب
+        restartButton.addEventListener('click', () => {
+            winOverlay.classList.remove('visible'); // إخفاء رسالة الفوز
+            initialize(); // إعادة تهيئة اللعبة
+        });
+
+        // --- منطق زر النسخ والانتقال المدمج ---
+        copyAndNavigateButton.addEventListener('click', () => {
+            // 1. نسخ الكود
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = copyTextValue;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            // 2. إظهار رسالة "تم النسخ"
+            copyMessage.classList.add('visible');
+            setTimeout(() => {
+                copyMessage.classList.remove('visible');
+            }, 2000); // إخفاء الرسالة بعد ثانيتين
+
+            // 3. الانتقال إلى الموقع في نافذة جديدة
+            window.open(questionsWebsiteUrl, "_blank");
+        });
+
     </script>
 </body>
 </html>
