@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* تعريف الخط المخصص محلياً (المفضل من الكود الثاني) */
+        /* تعريف الخط المخصص محلياً */
         @font-face {
             font-family: 'AA-galaxy';
             src:
@@ -64,80 +64,99 @@
             padding: var(--container-padding);
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            width: 100%; max-width: 1000px; /* زيادة أقصى عرض للسماح بالتخطيط الجانبي */
+            width: 100%; max-width: 1000px; 
             text-align: center;
         }
 
-        /* حاوية جديدة للصورة والشبكة */
         .game-layout-row {
             display: flex;
-            flex-direction: row; /* تم تغيير الاتجاه ليصبح أفقياً: العنوان والأزرار بجانب الشبكة */
-            align-items: center; /* تم التوسيط عمودياً */
-            justify-content: center; /* توسيط المجموعة أفقياً */
-            gap: 30px; /* مسافة بين العناصر */
-            margin-bottom: 30px; /* مسافة أسفل هذا الصف */
-            flex-wrap: wrap; /* للسماح بالعناصر بالانتقال لصف جديد على الشاشات الصغيرة */
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 30px; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
         }
 
-        /* أنماط نص العنوان الجديد */
         #game-title-and-buttons {
             display: flex;
             flex-direction: column;
-            align-items: center; /* توسيط العناصر داخل هذه الحاوية (العنوان والأزرار) */
-            gap: 15px; /* مسافة بين العنوان والأزرار */
+            align-items: center; 
+            gap: 15px; 
             flex-shrink: 0;
+        }
+
+        /* تعريف حركة الطفو الفردية لكل سطر (عمودي وأفقي) */
+        @keyframes individualLineFloat {
+            0% {
+                transform: skewX(-10deg) translate(0px, 0px);
+            }
+            25% {
+                transform: skewX(-10deg) translate(5px, -7px); /* يمين وأعلى */
+            }
+            50% {
+                transform: skewX(-10deg) translate(-2px, 4px);  /* يسار وللأسفل قليلاً */
+            }
+            75% {
+                transform: skewX(-10deg) translate(-5px, -5px); /* يسار وأعلى */
+            }
+            100% {
+                transform: skewX(-10deg) translate(0px, 0px);
+            }
         }
 
         #game-title-text {
             display: flex;
             flex-direction: column;
-            align-items: center; /* توسيط السطور أفقياً */
+            align-items: center; 
             justify-content: center;
             font-family: 'AA-galaxy', sans-serif;
-            line-height: 0.9; /* ضبط تباعد الأسطر */
-            padding: 10px; /* إضافة بعض الحشوة */
-            transform: skewX(-10deg); /* تطبيق الميلان على الكتلة بأكملها */
-            max-width: 250px; /* تقييد العرض بشكل مشابه للصورة */
+            line-height: 0.9; 
+            padding: 10px; 
+            max-width: 250px; 
             margin-left: auto;
             margin-right: auto;
         }
 
         #game-title-text span {
-            display: block; /* التأكد من أن كل سطر يأخذ سطرًا خاصًا به */
+            display: block; 
             font-weight: bold;
             text-shadow: 
                 -2px -2px 0 #333, 
                 2px -2px 0 #333, 
                 -2px 2px 0 #333, 
                 2px 2px 0 #333,
-                4px 4px 0 #555, /* ظل أعمق لتأثير ثلاثي الأبعاد */
-                6px 6px 0 #777; /* ظل أعمق */
-            white-space: nowrap; /* منع التفاف النص */
-            padding: 5px 0; /* إضافة حشوة رأسية للتباعد */
-            cursor: pointer; /* للإشارة إلى التفاعل */
-            transition: transform 0.2s ease;
-        }
-
-        #game-title-text span:hover {
-            transform: scale(1.05);
+                4px 4px 0 #555, 
+                6px 6px 0 #777; 
+            white-space: nowrap; 
+            padding: 5px 0; 
+            cursor: pointer; 
+            /* --current-transform: skewX(-10deg); /* قيمة ابتدائية لمتغير CSS */
         }
 
         #title-line-1 {
-            font-size: 3.5rem; /* ضبط الحجم حسب الحاجة */
+            font-size: 3.5rem; 
             color: #FFD700; /* أصفر */
+            animation: individualLineFloat 4.8s ease-in-out infinite 0.1s;
         }
 
         #title-line-2 {
-            font-size: 2.5rem; /* ضبط الحجم حسب الحاجة */
+            font-size: 2.5rem; 
             color: #4FC3F7; /* أزرق فاتح */
+            animation: individualLineFloat 5.3s ease-in-out infinite 0.6s; 
         }
 
         #title-line-3 {
-            font-size: 3.5rem; /* ضبط الحجم حسب الحاجة */
+            font-size: 3.5rem; 
             color: #EF5350; /* أحمر */
+            animation: individualLineFloat 4.0s ease-in-out infinite 1.2s; 
+        }
+        
+        #game-title-text span:hover {
+            transform: var(--current-transform, skewX(-10deg)) scale(1.05);
         }
 
-        /* أزرار التحكم بالألوان */
+
         .color-controls {
             margin-bottom: 30px;
             display: flex;
@@ -149,51 +168,50 @@
         .color-controls label {
             font-weight: bold;
             color: var(--color-text-dark);
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            font-family: 'AA-galaxy', sans-serif; 
         }
 
-        #grid-layout-container { /* الحاوية التي تحمل الشبكة والخلفية المثلثة */
+        #grid-layout-container { 
             position: relative;
-            padding: calc(var(--hex-height) * 0.75); /* لتوفير مساحة حول الشبكة نفسها */
+            padding: calc(var(--hex-height) * 0.75); 
             width: fit-content;
             margin: 0 auto;
-            border-radius: 15px; /* مطابقة للحاوية الرئيسية */
-            overflow: hidden; /* لإخفاء أي تداخل للخلفية */
-            flex-shrink: 0; /* منع الشبكة من الانكماش */
+            border-radius: 15px; 
+            overflow: hidden; 
+            flex-shrink: 0; 
         }
 
-        #grid-background { /* خلفية المثلثات */
+        #grid-background { 
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            /* Four triangles meeting at the center: Top/Bottom Green, Left/Right Orange */
             background: conic-gradient(
-                from 45deg at 50% 50%, /* Start angle to align triangles */
-                var(--color-team2) 0deg 90deg,    /* Orange (Right) */
-                var(--color-team1) 90deg 180deg,   /* Green (Bottom) */
-                var(--color-team2) 180deg 270deg,  /* Orange (Left) */
-                var(--color-team1) 270deg 360deg   /* Green (Top) */
+                from 45deg at 50% 50%, 
+                var(--color-team2) 0deg 90deg,    
+                var(--color-team1) 90deg 180deg,   
+                var(--color-team2) 180deg 270deg,  
+                var(--color-team1) 270deg 360deg   
             );
             z-index: 0;
             border-radius: 15px;
         }
 
-        #hex-grid { /* شبكة الأشكال السداسية الفعلية */
+        #hex-grid { 
             display: flex;
             flex-direction: column;
-            width: fit-content; /* لجعل العرض يتناسب مع الخلايا */
+            width: fit-content; 
             position: relative;
             z-index: 1;
-            margin: 0 auto; /* لوسيط الشبكة داخل حاويتها */
+            margin: 0 auto; 
         }
 
         .hex-row {
             display: flex;
-            margin-bottom: var(--hex-margin-v-overlap); /* تداخل عمودي بين الصفوف */
+            margin-bottom: var(--hex-margin-v-overlap); 
         }
         .hex-row:last-child { margin-bottom: 0; }
 
-        .hex-row:nth-child(even) { /* الصفوف الزوجية (0, 2, 4...) تزيح لليمين لتأثير خلية النحل */
+        .hex-row:nth-child(even) { 
             margin-inline-start: var(--hex-stagger-offset);
         }
 
@@ -201,73 +219,71 @@
             position: relative;
             width: var(--hex-width);
             height: var(--hex-height);
-            background-color: var(--color-cell-bg); /* أبيض غير شفاف */
+            background-color: var(--color-cell-bg); 
             cursor: pointer;
             clip-path: var(--hex-clip-path);
             display: flex;
             justify-content: center;
             align-items: center;
             transition: transform 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
-            box-sizing: border-box; /* لضمان أن الحدود لا تزيد الحجم */
-            margin-right: var(--hex-margin-h); /* تداخل أفقي للخلايا داخل الصف */
+            box-sizing: border-box; 
+            margin-right: var(--hex-margin-h); 
         }
-        .grid-cell:last-child { margin-right: 0; } /* آخر خلية في الصف لا تحتاج لتداخل أفقي */
+        .grid-cell:last-child { margin-right: 0; } 
 
         .grid-cell:hover:not(.answered-team1):not(.answered-team2) {
             transform: scale(1.08); z-index: 5;
         }
-        .cell-content { /* محتوى الحرف داخل الخلية */
+        .cell-content { 
             font-size: calc(var(--hex-width) * 0.45);
             max-width: calc(var(--hex-width) * 0.75);
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             font-weight: bold; user-select: none; text-align: center;
-            color: var(--color-cell-text); /* لون النص أسود */
-            font-family: 'AA-galaxy' !important; /* تطبيق الخط المخصص بقوة */
+            color: var(--color-cell-text); 
+            font-family: 'AA-galaxy' !important; 
         }
         .grid-cell.answered-team1, .grid-cell.answered-team2 { cursor: default; }
         .grid-cell.answered-team1:hover, .grid-cell.answered-team2:hover { transform: scale(1); }
 
-        .grid-cell.answered-team1 { /* خلية أجاب عليها الفريق الأول (الأخضر) */
+        .grid-cell.answered-team1 { 
             background-color: var(--color-team1) !important;
             border-color: var(--color-team1) !important;
         }
-        .grid-cell.answered-team2 { /* خلية أجاب عليها الفريق الثاني (البرتقالي) */
+        .grid-cell.answered-team2 { 
             background-color: var(--color-team2) !important;
             border-color: var(--color-team2) !important;
         }
         .grid-cell.answered-team1 .cell-content,
         .grid-cell.answered-team2 .cell-content {
-            color: var(--color-text-light) !important; /* لون النص أبيض في الخلايا المجاب عليها */
-            display: none; /* إخفاء الحرف عند الإجابة */
+            color: var(--color-text-light) !important; 
+            display: none; 
         }
 
-        /* --- أزرار الفرق الآن مكدسة فوق بعضها البعض --- */
         #team-buttons-area {
             display: flex;
-            flex-direction: column; /* جعل الأزرار تظهر فوق بعضها البعض */
+            flex-direction: column; 
             justify-content: center;
-            gap: 15px; /* مسافة بين الأزرار */
-            flex-wrap: wrap; /* للسماح للأزرار بالانتقال لصف جديد على الشاشات الصغيرة */
-            min-height: 50px; /* للحفاظ على المساحة حتى لو كانت الأزرار مخفية */
+            gap: 15px; 
+            flex-wrap: wrap; 
+            min-height: 50px; 
         }
         #team-buttons-area button {
             padding: 10px 20px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;
             color: var(--color-text-light); font-weight: bold; transition: background-color 0.3s ease, opacity 0.3s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            font-family: 'AA-galaxy', sans-serif; 
         }
         #team-buttons-area button:hover { opacity: 0.9; }
         #team-buttons-area .button-team1 { background-color: var(--color-team1); }
         #team-buttons-area .button-team2 { background-color: var(--color-team2); }
-        #team-buttons-area .button-cancel { background-color: #EF4444; /* أحمر */ }
+        #team-buttons-area .button-cancel { background-color: #EF4444; }
 
 
-        /* --- شريط التحميل ورسالة الفوز --- */
         #loading {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 1.3em; text-align: center;
             padding: 15px 25px; color: var(--color-text-light); font-weight: bold; background-color: var(--color-win-message-bg);
             border-radius: 8px; z-index: 30; max-width: 90%; display: block;
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            font-family: 'AA-galaxy', sans-serif; 
         }
         #loading.error-message { color: #FFCCCC; background-color: #8B0000; border: 1px solid #FFCCCC; }
         
@@ -283,30 +299,29 @@
             font-weight: bold;
             margin-bottom: 20px;
             animation: pulse 1.5s infinite;
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            font-family: 'AA-galaxy', sans-serif; 
         }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .restart-button {
             padding: 10px 20px; font-size: 1.2rem; background-color: #fff; color: #333;
             border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease;
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            font-family: 'AA-galaxy', sans-serif; 
         }
         .restart-button:hover { background-color: #eee; }
 
-        /* --- قسم الأزرار العلوية (نسخ وانتقال) --- */
-        #top-action-buttons-container { /* حاوية جديدة للأزرار العلوية */
-            position: fixed; /* لتثبيت الموقع */
-            left: 20px; /* على اليسار */
-            top: 20px; /* أعلى الشاشة */
+        #top-action-buttons-container { 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
             z-index: 20;
             display: flex;
-            flex-direction: column; /* الأزرار تحت بعضها */
-            gap: 10px; /* مسافة بين الأزرار */
-            align-items: flex-start; /* محاذاة لليسار */
+            flex-direction: column; 
+            gap: 10px; 
+            align-items: flex-start; 
         }
-        .action-button-style { /* نمط عام للأزرار الجديدة */
+        .action-button-style { 
             padding: 10px 20px;
-            background-color: #4CAF50; /* لون أخضر افتراضي */
+            background-color: #4CAF50; 
             color: white;
             border: none;
             border-radius: 8px;
@@ -317,39 +332,38 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            width: auto; /* لجعل الأزرار تأخذ عرض المحتوى */
-            min-width: 150px; /* حد أدنى للعرض */
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            width: auto; 
+            min-width: 150px; 
+            font-family: 'AA-galaxy', sans-serif; 
         }
         .action-button-style:hover {
             background-color: #45a049;
         }
         .copy-message {
             font-size: 0.9rem;
-            color: #4CAF50; /* أخضر للنجاح */
+            color: #4CAF50; 
             opacity: 0;
             transition: opacity 0.3s ease;
-            position: absolute; /* لتموضع الرسالة تحت الزر */
-            left: 0; /* محاذاة لليسار */
-            top: 100%; /* تحت الزر مباشرة */
-            margin-top: 5px; /* مسافة إضافية */
+            position: absolute; 
+            left: 0; 
+            top: 100%; 
+            margin-top: 5px; 
             background-color: rgba(0,0,0,0.7);
             padding: 5px 10px;
             border-radius: 5px;
             color: white;
             white-space: nowrap;
-            pointer-events: none; /* للسماح بالنقر على الزر من خلال الرسالة */
-            font-family: 'AA-galaxy', sans-serif; /* تطبيق الخط هنا */
+            pointer-events: none; 
+            font-family: 'AA-galaxy', sans-serif; 
         }
-        .button-with-message-wrapper { /* لتغليف الزر والرسالة معاً للتموضع النسبي */
+        .button-with-message-wrapper { 
             position: relative;
-            width: auto; /* لجعل التغليف يتناسب مع عرض الزر */
+            width: auto; 
         }
         .copy-message.visible {
             opacity: 1;
         }
 
-        /* --- Custom Alert Box (Modal) Styles --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -360,7 +374,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000; /* ليكون فوق كل شيء */
+            z-index: 1000; 
             opacity: 1;
             visibility: visible;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -369,7 +383,7 @@
         .modal-overlay.hidden {
             opacity: 0;
             visibility: hidden;
-            pointer-events: none; /* لمنع التفاعل عندما يكون مخفياً */
+            pointer-events: none; 
         }
 
         .modal-content {
@@ -386,7 +400,7 @@
         }
 
         .modal-overlay.hidden .modal-content {
-            transform: translateY(-20px); /* تأثير حركة عند الإخفاء */
+            transform: translateY(-20px); 
         }
 
         .modal-content h3 {
@@ -397,10 +411,10 @@
         }
 
         .modal-content input[type="text"] {
-            width: calc(100% - 20px); /* عرض الحقل مع بعض الهامش */
+            width: calc(100% - 20px); 
             padding: 12px;
             margin-bottom: 20px;
-            border: 2px solid var(--color-team1); /* لون حدود جميل */
+            border: 2px solid var(--color-team1); 
             border-radius: 8px;
             font-size: 1.1rem;
             text-align: center;
@@ -411,7 +425,7 @@
 
         .modal-content input[type="text"]:focus {
             border-color: var(--color-team2);
-            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3); /* ظل خفيف عند التركيز */
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3); 
         }
 
         .modal-buttons {
@@ -433,22 +447,22 @@
         }
 
         .modal-buttons button.confirm-btn {
-            background-color: var(--color-team1); /* أخضر */
+            background-color: var(--color-team1); 
             color: white;
         }
 
         .modal-buttons button.confirm-btn:hover {
-            background-color: #28a77a; /* أخضر أغمق */
+            background-color: #28a77a; 
             transform: translateY(-2px);
         }
 
         .modal-buttons button.cancel-btn {
-            background-color: #EF4444; /* أحمر */
+            background-color: #EF4444; 
             color: white;
         }
 
         .modal-buttons button.cancel-btn:hover {
-            background-color: #dc2626; /* أحمر أغمق */
+            background-color: #dc2626; 
             transform: translateY(-2px);
         }
 
@@ -482,7 +496,6 @@
             body { display: block; padding-top: 15px; }
             :root { --hex-width: 35px; }
             .cell-content { font-size: calc(var(--hex-width) * 0.5); }
-            /* في الشاشات الصغيرة جداً، اجعل العنوان والأزرار والشبكة تتكدس عمودياً */
             .game-layout-row {
                 flex-direction: column;
                 align-items: center;
@@ -490,7 +503,7 @@
             }
             #game-title-and-buttons {
                 width: 100%;
-                margin-bottom: 20px; /* مسافة إضافية قبل الشبكة */
+                margin-bottom: 20px; 
             }
             #game-title-text { max-width: 150px; margin: 0 auto; }
             #title-line-1 { font-size: 2rem; }
@@ -523,7 +536,8 @@
                 <div id="game-title-text">
                     <span id="title-line-1">حروف</span>
                     <span id="title-line-2">مع</span>
-                    <span id="title-line-3">خبزة</span> </div>
+                    <span id="title-line-3">خبزة</span> 
+                </div>
                 <div id="team-buttons-area">
                 </div>
             </div>
@@ -565,19 +579,19 @@
 
     <script>
         // --- Configuration ---
-        const gridRows = 6; // 6 صفوف
-        const gridCols = 6; // 6 أعمدة
+        const gridRows = 6; 
+        const gridCols = 6; 
 
         // --- Global State & Constants ---
-        let letters = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي"; // الحروف العربية
+        let letters = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي"; 
         let currentClickedCellId = null;
         let gameIsOver = false;
         const team1Class = 'answered-team1';
         const team2Class = 'answered-team2';
-        const copyTextValue = "0271162329"; // الرقم المراد نسخه
-        const questionsWebsiteUrl = "https://sahamstudio.com/horoof/questions.php"; // رابط موقع الأسئلة
-        const DEFAULT_PLAYER_NAME = "خبزة"; // الاسم الافتراضي
-        const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; // مفتاح التخزين المحلي
+        const copyTextValue = "0271162329"; 
+        const questionsWebsiteUrl = "https://sahamstudio.com/horoof/questions.php"; 
+        const DEFAULT_PLAYER_NAME = "خبزة"; 
+        const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; 
 
         // --- DOM Elements ---
         const loadingDiv = document.getElementById('loading');
@@ -587,14 +601,12 @@
         const winOverlay = document.getElementById('win-overlay');
         const winMessageText = document.getElementById('winMessageText');
         const restartButton = document.getElementById('restartButton');
-        const gameTitleTextDiv = document.getElementById('game-title-text'); // عنصر النص الجديد
-        const titleLine3 = document.getElementById('title-line-3'); // السطر الثالث القابل للتخصيص
+        const gameTitleTextDiv = document.getElementById('game-title-text'); 
+        const titleLine3 = document.getElementById('title-line-3'); 
         
-        // الزر المدمج
         const copyAndNavigateButton = document.getElementById('copyAndNavigateButton');
         const copyMessage = document.getElementById('copyMessage');
 
-        // عناصر مربع التنبيه المخصص
         const nameInputModal = document.getElementById('name-input-modal');
         const playerNameInput = document.getElementById('playerNameInput');
         const confirmNameBtn = document.getElementById('confirmNameBtn');
@@ -605,49 +617,55 @@
         function initialize() {
             console.log("Initializing game (Honeycomb Layout, all features)...");
             showLoading(true, "جاري تهيئة اللعبة...");
-            hexGrid.innerHTML = ''; // مسح الشبكة الحالية
-            hexGrid.style.display = 'none'; // إخفاء الشبكة مبدئياً
-            teamButtonsArea.style.display = 'none'; // إخفاء الأزرار مبدئياً
-            winOverlay.classList.remove('visible'); // إخفاء رسالة الفوز
-            nameInputModal.classList.add('hidden'); // إخفاء مربع التنبيه المخصص
+            hexGrid.innerHTML = ''; 
+            hexGrid.style.display = 'none'; 
+            teamButtonsArea.style.display = 'none'; 
+            winOverlay.classList.remove('visible'); 
+            nameInputModal.classList.add('hidden'); 
             gameIsOver = false;
 
-            // التأكد من أن عنصر النص مرئي
             if (gameTitleTextDiv) {
-                gameTitleTextDiv.style.display = 'flex'; // التأكد من أنه مرئي
+                gameTitleTextDiv.style.display = 'flex'; 
             }
 
-            // تحميل اسم اللاعب من التخزين المحلي
             loadPlayerName();
 
-            // إضافة مستمعي النقر المزدوج لجميع أسطر العنوان
             document.querySelectorAll('#game-title-text span').forEach(span => {
                 span.addEventListener('dblclick', handleNameChangeDblClick);
+                // Function to set the --current-transform CSS variable
+                function updateCurrentTransform() {
+                    const computedStyle = window.getComputedStyle(span);
+                    let currentTransform = computedStyle.transform;
+                    if (currentTransform === 'none') { // Fallback if transform is 'none'
+                        currentTransform = 'skewX(-10deg)';
+                    }
+                    span.style.setProperty('--current-transform', currentTransform);
+                }
+                // Call it on animation iteration
+                span.addEventListener('animationiteration', updateCurrentTransform);
+                // Call it once at the start after a short delay to ensure animation has begun
+                setTimeout(updateCurrentTransform, 100); 
             });
 
-            // تهيئة خلفية الشبكة
             updateGridBackground();
 
-            populateGrid(); // إنشاء الشبكة
-            showLoading(false); // إخفاء التحميل وإظهار الشبكة
+            populateGrid(); 
+            showLoading(false); 
             console.log("Grid populated. Ready.");
         }
 
-        // دالة لتحميل اسم اللاعب من localStorage
         function loadPlayerName() {
             const savedName = localStorage.getItem(PLAYER_NAME_STORAGE_KEY);
             titleLine3.innerText = savedName || DEFAULT_PLAYER_NAME;
             console.log("Player name loaded:", titleLine3.innerText);
         }
 
-        // دالة لمعالجة النقر المزدوج لتغيير الاسم (تستخدم الآن مربع تنبيه مخصص)
         function handleNameChangeDblClick() {
-            playerNameInput.value = titleLine3.innerText; // تعيين القيمة الحالية في حقل الإدخال
-            nameInputModal.classList.remove('hidden'); // إظهار مربع التنبيه المخصص
-            playerNameInput.focus(); // تركيز على حقل الإدخال
+            playerNameInput.value = titleLine3.innerText; 
+            nameInputModal.classList.remove('hidden'); 
+            playerNameInput.focus(); 
         }
 
-        // مستمع لزر التأكيد في مربع التنبيه المخصص
         confirmNameBtn.addEventListener('click', () => {
             const newName = playerNameInput.value.trim();
 
@@ -658,12 +676,11 @@
             } else {
                 console.warn("تم إلغاء تغيير الاسم أو إدخال اسم فارغ.");
             }
-            nameInputModal.classList.add('hidden'); // إخفاء مربع التنبيه
+            nameInputModal.classList.add('hidden'); 
         });
 
-        // مستمع لزر الإلغاء في مربع التنبيه المخصص
         cancelNameBtn.addEventListener('click', () => {
-            nameInputModal.classList.add('hidden'); // إخفاء مربع التنبيه
+            nameInputModal.classList.add('hidden'); 
             console.log("تم إلغاء تغيير الاسم.");
         });
 
@@ -675,17 +692,17 @@
             else { loadingDiv.classList.remove('error-message'); }
             
             if (!isLoading && !isError) {
-                hexGrid.style.display = 'flex'; // إظهار شبكة الأشكال السداسية
+                hexGrid.style.display = 'flex'; 
             } else {
-                hexGrid.style.display = 'none'; // إخفاء شبكة الأشكال السداسية
-                teamButtonsArea.style.display = 'none'; // إخفاء الأزرار
+                hexGrid.style.display = 'none'; 
+                teamButtonsArea.style.display = 'none'; 
             }
         }
 
         function populateGrid() {
             hexGrid.innerHTML = '';
             console.log(`Populating hex grid: ${gridRows}x${gridCols}`);
-            const shuffledLetters = shuffleArray(letters.split('')); // خلط الحروف
+            const shuffledLetters = shuffleArray(letters.split('')); 
 
             for (let r = 0; r < gridRows; r++) {
                 const rowDiv = document.createElement('div');
@@ -699,8 +716,8 @@
 
                     const contentDiv = document.createElement('div');
                     contentDiv.classList.add('cell-content');
-                    contentDiv.innerText = shuffledLetters[(r * gridCols + c) % shuffledLetters.length]; // تعيين حرف عشوائي
-                    cell.dataset.letter = contentDiv.innerText; // تخزين الحرف في dataset
+                    contentDiv.innerText = shuffledLetters[(r * gridCols + c) % shuffledLetters.length]; 
+                    cell.dataset.letter = contentDiv.innerText; 
                     
                     cell.appendChild(contentDiv);
                     cell.addEventListener('click', handleCellClick);
@@ -713,24 +730,21 @@
 
         function handleCellClick(event) {
             if (gameIsOver) {
-                // إذا انتهت اللعبة، عرض رسالة الفوز فقط
                 teamButtonsArea.innerHTML = "";
                 return;
             }
             const cell = event.currentTarget;
             currentClickedCellId = cell.id;
-            teamButtonsArea.innerHTML = ''; // مسح الأزرار السابقة
-            teamButtonsArea.style.display = 'flex'; // إظهار منطقة الأزرار
+            teamButtonsArea.innerHTML = ''; 
+            teamButtonsArea.style.display = 'flex'; 
 
             if (cell.classList.contains(team1Class) || cell.classList.contains(team2Class)) {
-                // إذا كانت الخلية مجاب عليها، عرض زر الإلغاء فقط
                 const cancelButton = document.createElement('button');
                 cancelButton.className = 'button-cancel';
                 cancelButton.innerText = 'إلغاء الإجابة';
                 cancelButton.onclick = () => cancelAnswer();
                 teamButtonsArea.appendChild(cancelButton);
             } else {
-                // إذا لم يتم الإجابة عليها، عرض أزرار اختيار الفريق
                 const btn1 = document.createElement('button');
                 btn1.className = 'button-team1';
                 btn1.innerText = 'الفريق الأول أجاب';
@@ -749,10 +763,10 @@
             const targetCell = document.getElementById(currentClickedCellId);
             if (targetCell && !targetCell.classList.contains(team1Class) && !targetCell.classList.contains(team2Class)) {
                 targetCell.classList.add(chosenTeamClass);
-                targetCell.querySelector('.cell-content').style.display = 'none'; // إخفاء الحرف
+                targetCell.querySelector('.cell-content').style.display = 'none'; 
                 checkWinCondition();
-                teamButtonsArea.innerHTML = ''; // إخفاء الأزرار بعد الاختيار
-                teamButtonsArea.style.display = 'none'; // إخفاء منطقة الأزرار
+                teamButtonsArea.innerHTML = ''; 
+                teamButtonsArea.style.display = 'none'; 
             }
             currentClickedCellId = null;
         }
@@ -762,9 +776,9 @@
             const targetCell = document.getElementById(currentClickedCellId);
             if (targetCell && (targetCell.classList.contains(team1Class) || targetCell.classList.contains(team2Class))) {
                 targetCell.classList.remove(team1Class, team2Class);
-                targetCell.querySelector('.cell-content').style.display = 'block'; // إظهار الحرف
-                teamButtonsArea.innerHTML = ''; // إخفاء الأزرار بعد الإلغاء
-                teamButtonsArea.style.display = 'none'; // إخفاء منطقة الأزرار
+                targetCell.querySelector('.cell-content').style.display = 'block'; 
+                teamButtonsArea.innerHTML = ''; 
+                teamButtonsArea.style.display = 'none'; 
             }
             currentClickedCellId = null;
         }
@@ -777,30 +791,29 @@
             return array;
         }
 
-        // دالة الحصول على الجيران (مهمة لشرط الفوز)
         function getNeighbors(r, c) {
             const neighbors = [];
-            const isEvenRow = (r % 2 === 0); // true if row index is even (0, 2, 4...)
+            const isEvenRow = (r % 2 === 0); 
 
             let potentialNeighbors;
-            if (isEvenRow) { // الصفوف الزوجية (0, 2, 4..)
+            if (isEvenRow) { 
                 potentialNeighbors = [
-                    [r, c - 1], [r, c + 1],          // يسار، يمين
-                    [r - 1, c], [r - 1, c - 1],      // أعلى-يمين، أعلى-يسار
-                    [r + 1, c], [r + 1, c - 1]       // أسفل-يمين، أسفل-يسار
+                    [r, c - 1], [r, c + 1],          
+                    [r - 1, c], [r - 1, c - 1],      
+                    [r + 1, c], [r + 1, c - 1]       
                 ];
-            } else { // الصفوف الفردية (1, 3, 5..)
+            } else { 
                 potentialNeighbors = [
-                    [r, c - 1], [r, c + 1],          // يسار، يمين
-                    [r - 1, c + 1], [r - 1, c],      // أعلى-يمين، أعلى-يسار
-                    [r + 1, c + 1], [r + 1, c]       // أسفل-يمين، أسفل-يسار
+                    [r, c - 1], [r, c + 1],          
+                    [r - 1, c + 1], [r - 1, c],      
+                    [r + 1, c + 1], [r + 1, c]       
                 ];
             }
 
             potentialNeighbors.forEach(([nr, nc]) => {
                 if (nr >= 0 && nr < gridRows && nc >= 0 && nc < gridCols) {
                     const neighborId = `cell-${nr}-${nc}`;
-                    if (document.getElementById(neighborId)) { // التأكد من وجود الخلية
+                    if (document.getElementById(neighborId)) { 
                         neighbors.push(neighborId);
                     }
                 }
@@ -809,12 +822,10 @@
         }
 
         function checkWinCondition() {
-            // الفريق الأول (Team 1) يحاول ربط الأعلى (الصف 0) بالأسفل (الصف gridRows-1)
             if (checkForPath(team1Class, 'row')) {
                 announceWinner("الفريق الأول فاز!", team1Class);
                 return;
             }
-            // الفريق الثاني (Team 2) يحاول ربط اليسار (العمود 0) باليمين (العمود gridCols-1)
             if (checkForPath(team2Class, 'col')) {
                 announceWinner("الفريق الثاني فاز!", team2Class);
                 return;
@@ -826,16 +837,16 @@
             const visited = new Set();
             let startCells = [];
 
-            if (dimension === 'row') { // ربط أعلى لأسفل (الفريق الأول)
+            if (dimension === 'row') { 
                 for (let c_idx = 0; c_idx < gridCols; c_idx++) {
-                    const cell = document.getElementById(`cell-0-${c_idx}`); // خلايا الصف الأول
+                    const cell = document.getElementById(`cell-0-${c_idx}`); 
                     if (cell && cell.classList.contains(teamClass)) {
                         startCells.push(cell);
                     }
                 }
-            } else { // ربط يسار ليمين (الفريق الثاني)
+            } else { 
                 for (let r_idx = 0; r_idx < gridRows; r_idx++) {
-                    const cell = document.getElementById(`cell-${r_idx}-0`); // خلايا العمود الأول
+                    const cell = document.getElementById(`cell-${r_idx}-0`); 
                     if (cell && cell.classList.contains(teamClass)) {
                         startCells.push(cell);
                     }
@@ -856,8 +867,8 @@
                 const r = parseInt(currentCell.dataset.row);
                 const c = parseInt(currentCell.dataset.col);
 
-                if (dimension === 'row' && r === gridRows - 1) return true; // وصل للصف الأخير
-                if (dimension === 'col' && c === gridCols - 1) return true; // وصل للعمود الأخير
+                if (dimension === 'row' && r === gridRows - 1) return true; 
+                if (dimension === 'col' && c === gridCols - 1) return true; 
 
                 const neighbors = getNeighbors(r, c);
                 neighbors.forEach(neighborId => {
@@ -878,24 +889,22 @@
             if (gameIsOver) return;
             gameIsOver = true;
             winMessageText.innerText = `🎉 ${winnerText} 🎉`;
-            winOverlay.classList.add('visible'); // إظهار رسالة الفوز
+            winOverlay.classList.add('visible'); 
             
-            // جعل الخلايا غير الفائزة باهتة وغير قابلة للنقر
             document.querySelectorAll('.grid-cell:not(.answered-team1):not(.answered-team2)')
                 .forEach(cell => { cell.style.opacity = '0.6'; cell.style.cursor = 'not-allowed'; });
             
-            teamButtonsArea.innerHTML = ''; // مسح الأزرار
-            teamButtonsArea.style.display = 'none'; // إخفاء منطقة الأزرار
+            teamButtonsArea.innerHTML = ''; 
+            teamButtonsArea.style.display = 'none'; 
         }
 
-        // --- Event Listeners for Color Pickers ---
         document.getElementById('team1Color').addEventListener('input', (e) => {
             document.documentElement.style.setProperty('--color-team1', e.target.value);
             document.querySelectorAll('.grid-cell.answered-team1').forEach(cell => {
                 cell.style.backgroundColor = e.target.value;
                 cell.style.borderColor = e.target.value;
             });
-            updateGridBackground(); // تحديث خلفية الشبكة
+            updateGridBackground(); 
         });
 
         document.getElementById('team2Color').addEventListener('input', (e) => {
@@ -904,31 +913,27 @@
                 cell.style.backgroundColor = e.target.value;
                 cell.style.borderColor = e.target.value;
             });
-            updateGridBackground(); // تحديث خلفية الشبكة
+            updateGridBackground(); 
         });
         
-        // دالة لتحديث خلفية الشبكة (تستدعى عند التهيئة وتغيير اللون)
         function updateGridBackground() {
             document.getElementById('grid-background').style.background = `
                 conic-gradient(
-                    from 45deg at 50% 50%, /* Start angle to align triangles */
-                    var(--color-team2) 0deg 90deg,    /* Orange (Right) */
-                    var(--color-team1) 90deg 180deg,   /* Green (Bottom) */
-                    var(--color-team2) 180deg 270deg,  /* Orange (Left) */
-                    var(--color-team1) 270deg 360deg   /* Green (Top) */
+                    from 45deg at 50% 50%, 
+                    var(--color-team2) 0deg 90deg,    
+                    var(--color-team1) 90deg 180deg,   
+                    var(--color-team2) 180deg 270deg,  
+                    var(--color-team1) 270deg 360deg   
                 )
             `;
         }
 
-        // مستمع حدث لزر إعادة اللعب
         restartButton.addEventListener('click', () => {
-            winOverlay.classList.remove('visible'); // إخفاء رسالة الفوز
-            initialize(); // إعادة تهيئة اللعبة
+            winOverlay.classList.remove('visible'); 
+            initialize(); 
         });
 
-        // --- منطق زر النسخ والانتقال المدمج ---
         copyAndNavigateButton.addEventListener('click', () => {
-            // 1. نسخ الكود
             const tempTextArea = document.createElement('textarea');
             tempTextArea.value = copyTextValue;
             document.body.appendChild(tempTextArea);
@@ -936,16 +941,15 @@
             document.execCommand('copy');
             document.body.removeChild(tempTextArea);
 
-            // 2. إظهار رسالة "تم النسخ"
             copyMessage.classList.add('visible');
             setTimeout(() => {
                 copyMessage.classList.remove('visible');
-            }, 2000); // إخفاء الرسالة بعد ثانيتين
+            }, 2000); 
 
-            // 3. الانتقال إلى الموقع في نافذة جديدة
             window.open(questionsWebsiteUrl, "_blank");
         });
 
     </script>
 </body>
 </html>
+
