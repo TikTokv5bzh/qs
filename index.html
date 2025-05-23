@@ -735,7 +735,7 @@
         function announceWinner(winnerText, winnerClass) {
             if (gameIsOver) return;
             gameIsOver = true;
-            winMessageText.innerText = `🎉 ${winnerText} �`;
+            winMessageText.innerText = `🎉 ${winnerText}`;
             winOverlay.classList.add('visible'); 
             document.querySelectorAll('.grid-cell:not(.answered-team1):not(.answered-team2)')
                 .forEach(cell => { cell.style.opacity = '0.6'; cell.style.cursor = 'not-allowed'; });
