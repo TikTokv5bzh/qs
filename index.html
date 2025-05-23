@@ -47,7 +47,7 @@
             --container-padding: 30px;
 
             /* --- أبعاد للخلايا السداسية الزخرفية --- */
-            --hex-width-decorative: 55px; /* تم تكبير الحجم */
+            --hex-width-decorative: 55px; 
             --hex-height-decorative: calc(var(--hex-width-decorative) * 0.8660254);
         }
         *, *::before, *::after { box-sizing: border-box; }
@@ -71,6 +71,43 @@
             overflow: hidden; 
         }
 
+        /* --- قسم زر الأسئلة (كان top-action-buttons-container) --- */
+        #action-button-area { /* تم تغيير الاسم ليعكس الغرض العام أكثر */
+            display: flex;
+            justify-content: center; 
+            position: relative; 
+            z-index: 10; 
+        }
+        .action-button-style {
+            padding: 10px 15px; /* تم تعديل الحشوة قليلاً */
+            background-color: #4CAF50; color: white; border: none;
+            border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: auto; 
+            min-width: 130px; /* تم تقليل الحد الأدنى للعرض */
+            font-family: 'AA-galaxy', sans-serif;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-button-style:hover { background-color: #45a049; }
+        .copy-message {
+            font-size: 0.9rem; color: #4CAF50; opacity: 0; transition: opacity 0.3s ease;
+            position: absolute; left: 50%; 
+            transform: translateX(-50%); 
+            bottom: 100%; /* تغيير ليظهر فوق الزر */
+            margin-bottom: 8px; /* مسافة بين الرسالة والزر */
+            background-color: rgba(0,0,0,0.75);
+            padding: 6px 12px; border-radius: 5px; color: white; white-space: nowrap;
+            pointer-events: none; font-family: 'AA-galaxy', sans-serif;
+            z-index: 11; 
+        }
+        .button-with-message-wrapper { 
+            position: relative; 
+            width: auto; 
+            display: inline-block; 
+        }
+        .copy-message.visible { opacity: 1; }
+
+
         .game-layout-row {
             display: flex; flex-direction: row; align-items: center;
             justify-content: center; gap: 30px; margin-bottom: 30px;
@@ -79,7 +116,8 @@
 
         #game-title-and-buttons {
             display: flex; flex-direction: column; align-items: center;
-            gap: 15px; flex-shrink: 0;
+            gap: 20px; /* زيادة المسافة قليلاً لتعويض إزالة الزر من هنا */
+            flex-shrink: 0;
         }
 
         #game-title-text {
@@ -102,10 +140,27 @@
         #title-line-3 { font-size: 3.5rem; color: #EF5350; }
 
         .color-controls {
-            margin-bottom: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
+            /* margin-bottom: 30px; /* تمت الإزالة، ستتم إدارتها بواسطة الحاوية الأم */
+            display: flex; justify-content: center; align-items: center; /* توسيط المحتوى */
+            gap: 10px 20px; /* gap عمودي وأفقي */
+            flex-wrap: wrap;
             position: relative; z-index: 2;
         }
+        .color-controls > div { /* لتوسيط كل زوج من label و input */
+            display: flex;
+            flex-direction: column; /* label فوق input */
+            align-items: center;
+            gap: 5px;
+        }
         .color-controls label { font-weight: bold; color: var(--color-text-dark); font-family: 'AA-galaxy', sans-serif; }
+        .color-controls input[type="color"] { /* لضمان حجم مناسب لمربع اللون */
+            width: 50px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
 
         #grid-layout-container {
             position: relative; padding: calc(var(--hex-height) * 0.75); width: fit-content;
@@ -186,25 +241,6 @@
         }
         .restart-button:hover { background-color: #eee; }
 
-        #top-action-buttons-container {
-            position: fixed; left: 20px; top: 20px; z-index: 20; display: flex;
-            flex-direction: column; gap: 10px; align-items: flex-start;
-        }
-        .action-button-style {
-            padding: 10px 20px; background-color: #4CAF50; color: white; border: none;
-            border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: auto; min-width: 150px; font-family: 'AA-galaxy', sans-serif;
-        }
-        .action-button-style:hover { background-color: #45a049; }
-        .copy-message {
-            font-size: 0.9rem; color: #4CAF50; opacity: 0; transition: opacity 0.3s ease;
-            position: absolute; left: 0; top: 100%; margin-top: 5px; background-color: rgba(0,0,0,0.7);
-            padding: 5px 10px; border-radius: 5px; color: white; white-space: nowrap;
-            pointer-events: none; font-family: 'AA-galaxy', sans-serif;
-        }
-        .button-with-message-wrapper { position: relative; width: auto; }
-        .copy-message.visible { opacity: 1; }
 
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7);
@@ -255,7 +291,7 @@
             position: relative;
             width: var(--hex-width-decorative);
             height: var(--hex-height-decorative);
-            background-color: rgba(180, 180, 180, 0.35); /* تم تغيير اللون إلى رمادي فاتح */
+            background-color: rgba(180, 180, 180, 0.35); 
             clip-path: var(--hex-clip-path); 
             display: flex;
             justify-content: center;
@@ -267,7 +303,7 @@
         .decorative-hex-grid .grid-cell:hover { transform: none; z-index: auto; }
         .decorative-hex-grid .cell-content {
             font-size: calc(var(--hex-width-decorative) * 0.45);
-            color: rgba(100, 100, 100, 0.6); /* تم تغيير اللون إلى رمادي أغمق */
+            color: rgba(100, 100, 100, 0.6); 
             font-weight: normal; 
             user-select: none;
             text-align: center;
@@ -276,28 +312,55 @@
         }
 
         #decorative-grid-top-left {
-            top: -65px; /* تم تعديل الموضع ليتناسب مع الحجم الجديد */
-            left: -65px; /* تم تعديل الموضع ليتناسب مع الحجم الجديد */
+            top: -65px; 
+            left: -65px; 
             transform: rotate(-18deg); 
             opacity: 0.55; 
         }
         #decorative-grid-bottom-right {
-            bottom: -65px; /* تم تعديل الموضع ليتناسب مع الحجم الجديد */
-            right: -65px;   /* تم تعديل الموضع ليتناسب مع الحجم الجديد */
+            bottom: -65px; 
+            right: -65px;   
             transform: rotate(18deg);
             opacity: 0.55; 
         }
 
+        /* --- حاوية جديدة لأدوات التحكم السفلية (زر الأسئلة + ألوان الفرق) --- */
+        #page-controls-container {
+            display: flex;
+            flex-direction: column; /* افتراضي للشاشات الصغيرة */
+            align-items: center;
+            gap: 20px; /* المسافة بين العناصر عند التكديس */
+            width: 100%;
+            margin-top: 20px; /* مسافة فوق هذه المجموعة */
+            margin-bottom: 30px; /* مسافة أسفل هذه المجموعة */
+            padding: 0 10px; /* حشوة جانبية صغيرة */
+        }
+
+
         /* --- Responsive --- */
+        @media (min-width: 768px) { /* md breakpoint, أو أي نقطة مناسبة */
+            #page-controls-container {
+                flex-direction: row; /* ترتيب أفقي للشاشات الأكبر */
+                justify-content: center; /* توسيط المجموعة */
+                gap: 30px; /* المسافة بين العناصر في الصف */
+            }
+            .color-controls {
+                gap: 20px; /* استعادة الـ gap الأصلي للشاشات الأكبر */
+            }
+             .color-controls > div {
+                flex-direction: row; /* label بجانب input */
+                align-items: center;
+             }
+        }
+
         @media (max-width: 900px) {
             :root { 
                 --hex-width: 50px; 
-                --hex-width-decorative: 40px; /* تعديل حجم الشبكة الزخرفية للشاشات المتوسطة */
+                --hex-width-decorative: 40px; 
             }
             #game-title-text { max-width: 200px; }
             #title-line-1 { font-size: 3rem; } #title-line-2 { font-size: 2rem; } #title-line-3 { font-size: 3rem; }
-            #top-action-buttons-container { left: 15px; top: 15px; }
-            .action-button-style { min-width: 120px; padding: 8px 15px; font-size: 0.9em;}
+            .action-button-style { min-width: 120px; padding: 8px 15px; font-size: 0.9em;} 
             #team-buttons-area { gap: 10px; }
             #team-buttons-area button { min-width: 100px; padding: 7px 14px; font-size: 0.9em;}
             .cell-content { font-size: calc(var(--hex-width) * 0.46); }
@@ -315,13 +378,12 @@
         @media (max-width: 700px) {
             :root { 
                 --hex-width: 42px; 
-                --hex-width-decorative: 30px; /* تعديل حجم الشبكة الزخرفية للشاشات الأصغر */
+                --hex-width-decorative: 30px; 
             }
             .cell-content { font-size: calc(var(--hex-width) * 0.48); }
             #game-title-text { max-width: 180px; }
             #title-line-1 { font-size: 2.5rem; } #title-line-2 { font-size: 1.8rem; } #title-line-3 { font-size: 2.5rem; }
-            #top-action-buttons-container { left: 10px; top: 10px; }
-            .action-button-style { min-width: 100px; padding: 7px 12px; font-size: 0.8em;}
+            .action-button-style { min-width: 120px; padding: 7px 12px; font-size: 0.8em;} 
             #team-buttons-area { gap: 6px; }
             #team-buttons-area button { min-width: 85px; padding: 6px 12px; font-size: 0.8em;}
 
@@ -339,18 +401,32 @@
             body { display: block; padding-top: 15px; }
             :root { 
                 --hex-width: 35px; 
-                --hex-width-decorative: 25px; /* تعديل حجم الشبكة الزخرفية للشاشات الصغيرة جداً */
+                --hex-width-decorative: 25px; 
             }
             .cell-content { font-size: calc(var(--hex-width) * 0.5); }
             .game-layout-row { flex-direction: column; align-items: center; gap: 20px; }
-            #game-title-and-buttons { width: 100%; margin-bottom: 20px; }
+            #game-title-and-buttons { width: 100%; margin-bottom: 20px; gap: 15px; /* ضبط الـ gap هنا أيضاً */ }
             #game-title-text { max-width: 150px; margin: 0 auto; }
             #title-line-1 { font-size: 2rem; } #title-line-2 { font-size: 1.5rem; } #title-line-3 { font-size: 2rem; }
-            #top-action-buttons-container, #team-buttons-area {
+            
+            #team-buttons-area {
                 position: relative; left: auto; right: auto; top: auto; transform: none;
-                width: 95%; max-width: 300px; margin: 10px auto 0 auto; z-index: 5;
+                width: 95%; max-width: 300px; margin: 0 auto; 
+                z-index: 5;
+                flex-direction: column; justify-content: center; 
             }
-            #team-buttons-area { flex-direction: column; justify-content: center; margin-bottom: 0; }
+            .action-button-style { 
+                 width: auto; /* السماح للزر بأخذ عرض المحتوى + الحشوة */
+                 min-width: 120px; /* ضمان حد أدنى للعرض */
+                 padding: 8px 15px; /* تعديل الحشوة لتناسب الشاشات الصغيرة */
+            } 
+            #page-controls-container {
+                 gap: 15px; /* تقليل المسافة بين العناصر المكدسة */
+            }
+            .color-controls > div { /* ضمان أن label فوق input على الشاشات الصغيرة جداً */
+                flex-direction: column;
+                align-items: center;
+            }
             
             #decorative-grid-top-left {
                 top: -30px; 
@@ -369,17 +445,6 @@
 </head>
 <body>
 
-    <div id="top-action-buttons-container">
-        <div class="button-with-message-wrapper">
-            <button id="copyAndNavigateButton" class="action-button-style">
-                <i class="far fa-copy"></i>
-                <i class="fas fa-external-link-alt"></i>
-                <span>نسخ وانتقال للأسئلة</span>
-            </button>
-            <span id="copyMessage" class="copy-message">تم النسخ!</span>
-        </div>
-    </div>
-
     <div id="game-content-wrapper">
         <div id="decorative-grid-top-left" class="decorative-hex-grid"></div>
         <div id="decorative-grid-bottom-right" class="decorative-hex-grid"></div>
@@ -389,7 +454,8 @@
                 <div id="game-title-text">
                     <span id="title-line-1">حروف</span>
                     <span id="title-line-2">مع</span>
-                    <span id="title-line-3">خبزة</span> </div>
+                    <span id="title-line-3">خبزة</span> 
+                </div>
                 <div id="team-buttons-area">
                 </div>
             </div>
@@ -400,14 +466,25 @@
             </div>
         </div>
         
-        <div class="color-controls">
-            <div>
-                <label for="team1Color">الفريق الأول:</label>
-                <input type="color" id="team1Color" value="#34D399">
+        <div id="page-controls-container">
+            <div id="action-button-area"> <div class="button-with-message-wrapper">
+                    <button id="copyAndNavigateButton" class="action-button-style">
+                        <i class="far fa-copy"></i>
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>الأسئلة</span> </button>
+                    <span id="copyMessage" class="copy-message">تم النسخ!</span>
+                </div>
             </div>
-            <div>
-                <label for="team2Color">الفريق الثاني:</label>
-                <input type="color" id="team2Color" value="#FB923C">
+
+            <div class="color-controls">
+                <div>
+                    <label for="team1Color">الفريق الأول:</label>
+                    <input type="color" id="team1Color" value="#34D399">
+                </div>
+                <div>
+                    <label for="team2Color">الفريق الثاني:</label>
+                    <input type="color" id="team2Color" value="#FB923C">
+                </div>
             </div>
         </div>
     </div>
@@ -488,7 +565,6 @@
             updateGridBackground();
             populateGrid(); 
             
-            // يمكنك تعديل عدد الصفوف والأعمدة للشبكات الزخرفية هنا إذا أردت
             if (decorativeGridTL) {
                 createDecorativeGrid(decorativeGridTL, 5, 5); 
             }
@@ -735,7 +811,7 @@
         function announceWinner(winnerText, winnerClass) {
             if (gameIsOver) return;
             gameIsOver = true;
-            winMessageText.innerText = `🎉 ${winnerText}`;
+            winMessageText.innerText = `🎉 ${winnerText} 🎉`;
             winOverlay.classList.add('visible'); 
             document.querySelectorAll('.grid-cell:not(.answered-team1):not(.answered-team2)')
                 .forEach(cell => { cell.style.opacity = '0.6'; cell.style.cursor = 'not-allowed'; });
