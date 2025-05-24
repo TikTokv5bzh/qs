@@ -42,13 +42,14 @@
 
             /* --- الأبعاد الأساسية للشكل السداسي --- */
             --hex-width: 85px;
-            --hex-height: calc(var(--hex-width) * 0.8660254);
+            --hex-height: calc(var(--hex-width) * 0.8660254); /* 0.8660254 is approx sqrt(3)/2 */
             --hex-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
             /* --- تعديلات التداخل لخلايا النحل المتلاصقة --- */
-            --hex-margin-h: calc(var(--hex-width) * -0.1);
-            --hex-margin-v-overlap: calc(var(--hex-height) * -0.2);
-            --hex-stagger-offset: calc(var(--hex-width) * 0.75 / 2);
+            --hex-margin-h: calc(var(--hex-width) * -0.134); /* Adjusted for tighter packing */
+            --hex-margin-v-overlap: calc(var(--hex-height) * -0.25); /* Adjusted for tighter packing */
+            --hex-stagger-offset: calc(var(--hex-width) * (1 - 0.134*2) / 2); /* Adjusted for tighter packing */
+
 
             --container-padding: 20px; 
 
@@ -59,8 +60,12 @@
             --score-hex-height: calc(var(--score-hex-width) * 0.8660254);
             --grid-size-hex-width: 60px;
             --grid-size-hex-height: calc(var(--grid-size-hex-width) * 0.8660254);
-            --grid-size-option-hex-width: 40px; /* Smaller hex for options */
+            
+            --grid-size-option-hex-width: 45px; 
             --grid-size-option-hex-height: calc(var(--grid-size-option-hex-width) * 0.8660254);
+            --modal-hex-option-margin-h: calc(var(--grid-size-option-hex-width) * -0.134);
+            --modal-hex-option-margin-v-overlap: calc(var(--grid-size-option-hex-height) * -0.25);
+
         }
         *, *::before, *::after { box-sizing: border-box; }
 
@@ -283,57 +288,6 @@
         #grid-size-button:hover {
             background-color: #e0e0e0;
         }
-        #grid-size-options {
-            position: absolute;
-            bottom: calc(100% + 10px); 
-            left: 50%;
-            background-color: rgba(255, 255, 255, 0.95); 
-            border-radius: 10px; 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
-            padding: 10px;
-            z-index: 20;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(var(--grid-size-option-hex-width), 1fr)); 
-            gap: 8px; 
-            width: auto; 
-            max-width: calc( (var(--grid-size-option-hex-width) + 8px) * 4 ); 
-            opacity: 0; 
-            visibility: hidden;
-            transition: opacity 0.2s ease-out, visibility 0.2s ease-out, transform 0.2s ease-out;
-            transform: translateX(-50%) translateY(10px); 
-        }
-        #grid-size-options.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
-        .grid-size-option-btn {
-            width: var(--grid-size-option-hex-width);
-            height: var(--grid-size-option-hex-height);
-            background-color: var(--color-grid-size-option-bg);
-            color: var(--color-grid-size-button-text);
-            clip-path: var(--hex-clip-path); 
-            display: flex; 
-            justify-content: center;
-            align-items: center;
-            font-family: 'AA-galaxy', sans-serif;
-            font-size: calc(var(--grid-size-option-hex-width) * 0.4);
-            font-weight: bold;
-            cursor: pointer;
-            border: 1px solid #bbb; 
-            transition: background-color 0.2s ease, transform 0.15s ease;
-        }
-        .grid-size-option-btn:hover {
-            background-color: var(--color-grid-size-option-hover-bg);
-            transform: scale(1.05); 
-        }
-        .grid-size-option-btn.selected {
-            background-color: var(--color-team1);
-            color: var(--color-text-light);
-            border-color: var(--color-team1);
-            transform: scale(1.05);
-        }
-
 
         #loading {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 1.3em; text-align: center;
@@ -360,28 +314,85 @@
         }
         .restart-button:hover { background-color: #eee; }
 
+        /* General Modal Styles (reused for name and grid size) */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7);
             display: flex; justify-content: center; align-items: center; z-index: 1000;
-            opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0; visibility: hidden; pointer-events: none; 
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .modal-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+
         .modal-content {
-            background-color: #FFFFFF; padding: 30px; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); text-align: center; max-width: 400px;
-            width: 90%; transform: translateY(0); transition: transform 0.3s ease;
+            background-color: #FFFFFF; padding: 25px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); text-align: center; max-width: 280px; /* Adjusted for 3 columns of smaller hexes */
+            width: 90%; transform: translateY(-20px) scale(0.95); opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
             font-family: 'AA-galaxy', sans-serif;
         }
-        .modal-overlay.hidden .modal-content { transform: translateY(-20px); }
+        .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); opacity: 1;}
+
         .modal-content h3 { font-size: 1.8rem; color: var(--color-text-dark); margin-bottom: 20px; font-weight: bold; }
-        .modal-content input[type="text"] {
+        .modal-content input[type="text"] { 
             width: calc(100% - 20px); padding: 12px; margin-bottom: 20px;
             border: 2px solid var(--color-team1); border-radius: 8px; font-size: 1.1rem;
             text-align: center; font-family: 'AA-galaxy', sans-serif; outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .modal-content input[type="text"]:focus { border-color: var(--color-team2); box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3); }
-        .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+        
+        /* Grid Size Options in Modal - Styled like a hex grid */
+        #grid-size-options-modal-content {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-bottom: 20px;
+            padding: 0 5px; 
+        }
+        .modal-hex-option-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--modal-hex-option-margin-v-overlap); /* Negative margin for overlap */
+        }
+        .modal-hex-option-row:last-child {
+            margin-bottom: 0;
+        }
+         .modal-hex-option-row:nth-child(even) {
+            /* No stagger for a more grid-like feel in the modal, adjust if honeycomb needed */
+        }
+
+        .modal-grid-size-option-btn {
+            width: var(--grid-size-option-hex-width);
+            height: var(--grid-size-option-hex-height);
+            background-color: var(--color-grid-size-option-bg);
+            color: var(--color-grid-size-button-text);
+            clip-path: var(--hex-clip-path); 
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            font-family: 'AA-galaxy', sans-serif;
+            font-size: calc(var(--grid-size-option-hex-width) * 0.4);
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #bbb; 
+            transition: background-color 0.2s ease, transform 0.15s ease;
+            margin-right: var(--modal-hex-option-margin-h); /* Negative margin for overlap */
+        }
+        .modal-grid-size-option-btn:last-child { /* Remove margin from last item in a conceptual row */
+             margin-right: 0;
+        }
+        .modal-grid-size-option-btn:hover {
+            background-color: var(--color-grid-size-option-hover-bg);
+            transform: scale(1.05); 
+        }
+        .modal-grid-size-option-btn.selected {
+            background-color: var(--color-team1);
+            color: var(--color-text-light);
+            border-color: var(--color-team1);
+            transform: scale(1.05);
+        }
+
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
         .modal-buttons button {
             padding: 10px 25px; border: none; border-radius: 8px; font-size: 1.1rem;
             font-weight: bold; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease;
@@ -416,22 +427,22 @@
         @media (min-width: 768px) { 
             .game-layout-row {
                 flex-direction: row; 
-                align-items: center; /* Align items vertically in the center of the row */
+                align-items: center; 
                 justify-content: center; 
-                gap: 10px; /* Further reduced gap */
+                gap: 10px; 
             }
             #info-panel {
                 order: 1; 
                 flex-shrink: 0; 
                 width: auto; 
-                max-width: 280px; /* Slightly reduced max-width for info panel */
+                max-width: 280px; 
                 margin-bottom: 0; 
                 align-items: center; 
-                align-self: center; /* Ensure it aligns with grid-layout if heights differ */
+                align-self: center; 
             }
             #grid-layout-container {
                 order: 2; 
-                align-self: center; /* Ensure it aligns with info-panel if heights differ */
+                align-self: center; 
             }
             #header-content-wrapper { 
                 display: grid; 
@@ -460,7 +471,7 @@
             #title-line-3 { font-size: 3.2rem; }
             .win-message-text { font-size: 4rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
-            #grid-size-options { bottom: calc(100% + 10px); top: auto; } 
+            .modal-content { max-width: 280px; } /* Adjust modal width for desktop */
         }
         
         @media (max-width: 900px) and (min-width: 768px) { 
@@ -494,11 +505,7 @@
             #decorative-grid-bottom-right { bottom: -50px; right: -50px; }
             .win-message-text { font-size: 2.8rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.38); }
-            #grid-size-options {
-                bottom: auto; 
-                top: calc(100% + 8px); 
-                max-width: calc( (var(--grid-size-option-hex-width) + 8px) * 5 ); 
-            }
+            .modal-content { max-width: 260px; padding: 20px } 
         }
         @media (max-width: 550px) { 
             body { display: block; padding-top: 15px; } 
@@ -520,9 +527,7 @@
             #decorative-grid-bottom-right { bottom: -30px; right: -30px; transform: rotate(15deg); opacity: 0.45; }
             .win-message-text { font-size: 2.2rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
-             #grid-size-options {
-                max-width: calc( (var(--grid-size-option-hex-width) + 8px) * 4 ); 
-            }
+            .modal-content { max-width: 230px; padding: 15px; }
         }
     </style>
 </head>
@@ -578,8 +583,6 @@
             </div>
             <div id="grid-size-control-area">
                 <div id="grid-size-button" title="تغيير حجم الشبكة">6</div>
-                <div id="grid-size-options">
-                    </div>
             </div>
         </div>
     </div>
@@ -590,7 +593,7 @@
         <button class="restart-button" id="restartButton">إعادة اللعب</button>
     </div>
 
-    <div id="name-input-modal" class="modal-overlay hidden">
+    <div id="name-input-modal" class="modal-overlay"> 
         <div class="modal-content">
             <h3>أدخل اسمك الجديد</h3>
             <input type="text" id="playerNameInput" placeholder="اكتب اسمك هنا">
@@ -601,10 +604,22 @@
         </div>
     </div>
 
+    <div id="grid-size-modal" class="modal-overlay"> 
+        <div class="modal-content">
+            <h3>اختر حجم الشبكة</h3>
+            <div id="grid-size-options-modal-content">
+                </div>
+            <div class="modal-buttons">
+                <button id="cancelGridSizeBtn" class="cancel-btn">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- Configuration ---
         const MIN_GRID_SIZE = 3;
-        const MAX_GRID_SIZE = 9;
+        const MAX_GRID_SIZE = 9; // Max grid size is now 9
         let currentGridSize = 6; // Default grid size
         let gridRows = currentGridSize; 
         let gridCols = currentGridSize; 
@@ -634,10 +649,17 @@
         const titleLine3 = document.getElementById('title-line-3');
         const copyAndNavigateButton = document.getElementById('copyAndNavigateButton');
         const copyMessage = document.getElementById('copyMessage');
+        
         const nameInputModal = document.getElementById('name-input-modal');
         const playerNameInput = document.getElementById('playerNameInput');
         const confirmNameBtn = document.getElementById('confirmNameBtn');
         const cancelNameBtn = document.getElementById('cancelNameBtn');
+        
+        const gridSizeModal = document.getElementById('grid-size-modal');
+        const gridSizeOptionsModalContent = document.getElementById('grid-size-options-modal-content');
+        const cancelGridSizeBtn = document.getElementById('cancelGridSizeBtn');
+        const gridSizeButton = document.getElementById('grid-size-button'); 
+
         const decorativeGridTL = document.getElementById('decorative-grid-top-left');
         const decorativeGridBR = document.getElementById('decorative-grid-bottom-right');
 
@@ -647,9 +669,6 @@
         const team2ScoreDisplay = document.getElementById('team2-score');
         const team1ColorHexInput = document.getElementById('team1ColorHexInput');
         const team2ColorHexInput = document.getElementById('team2ColorHexInput');
-
-        const gridSizeButton = document.getElementById('grid-size-button');
-        const gridSizeOptionsContainer = document.getElementById('grid-size-options');
 
 
         window.addEventListener('load', initialize);
@@ -662,15 +681,15 @@
             gridCols = currentGridSize;
 
             if(gridSizeButton) gridSizeButton.textContent = currentGridSize;
-            createGridSizeOptions(); 
-
+            
             if(hexGrid) {
                 hexGrid.innerHTML = ''; 
                 hexGrid.style.display = 'none'; 
             }
             if(teamButtonsArea) teamButtonsArea.style.display = 'none'; 
             if(winOverlay) winOverlay.classList.remove('visible'); 
-            if(nameInputModal) nameInputModal.classList.add('hidden'); 
+            if(nameInputModal) nameInputModal.classList.remove('visible'); 
+            if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
             gameIsOver = false;
             
             updateScoreDisplay(); 
@@ -718,12 +737,23 @@
             console.log("Initialization complete.");
         }
 
-        function createGridSizeOptions() {
-            if (!gridSizeOptionsContainer) return;
-            gridSizeOptionsContainer.innerHTML = ''; 
+        function createGridSizeOptionsInModal() {
+            if (!gridSizeOptionsModalContent) return;
+            gridSizeOptionsModalContent.innerHTML = ''; 
+            
+            let currentRow = null;
+            const itemsPerRow = 3; // Controls how many hexes per "conceptual" row in the modal
+
             for (let i = MIN_GRID_SIZE; i <= MAX_GRID_SIZE; i++) {
+                // Create a new row div if it's the start of a new row
+                if ((i - MIN_GRID_SIZE) % itemsPerRow === 0) {
+                    currentRow = document.createElement('div');
+                    currentRow.classList.add('modal-hex-option-row');
+                    gridSizeOptionsModalContent.appendChild(currentRow);
+                }
+
                 const optionBtn = document.createElement('button');
-                optionBtn.classList.add('grid-size-option-btn');
+                optionBtn.classList.add('modal-grid-size-option-btn');
                 optionBtn.textContent = i;
                 if (i === currentGridSize) {
                     optionBtn.classList.add('selected');
@@ -731,23 +761,11 @@
                     optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.color = 'var(--color-text-light)';
                 }
-                optionBtn.addEventListener('click', (event) => {
-                    event.stopPropagation(); 
+                optionBtn.addEventListener('click', () => {
                     currentGridSize = i;
                     if(gridSizeButton) gridSizeButton.textContent = currentGridSize;
                     
-                    gridSizeOptionsContainer.querySelectorAll('.grid-size-option-btn').forEach(btn => {
-                        btn.classList.remove('selected');
-                        btn.style.backgroundColor = ''; 
-                        btn.style.borderColor = '';
-                        btn.style.color = '';
-                    });
-                    optionBtn.classList.add('selected');
-                    optionBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
-                    optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
-                    optionBtn.style.color = 'var(--color-text-light)';
-
-                    gridSizeOptionsContainer.classList.remove('visible'); 
+                    if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
                     
                     team1Score = 0;
                     team2Score = 0;
@@ -755,23 +773,20 @@
                     
                     initialize(); 
                 });
-                gridSizeOptionsContainer.appendChild(optionBtn);
+                if(currentRow) currentRow.appendChild(optionBtn); // Append button to the current row
             }
         }
 
         function setupGridSizeControls() {
-            if (gridSizeButton && gridSizeOptionsContainer) {
-                gridSizeButton.addEventListener('click', (event) => {
-                    event.stopPropagation(); 
-                    gridSizeOptionsContainer.classList.toggle('visible');
+            if (gridSizeButton && gridSizeModal) {
+                gridSizeButton.addEventListener('click', () => {
+                    createGridSizeOptionsInModal(); 
+                    gridSizeModal.classList.add('visible');
                 });
-
-                document.addEventListener('click', (event) => {
-                    if (gridSizeOptionsContainer.classList.contains('visible') && 
-                        !gridSizeButton.contains(event.target) && 
-                        !gridSizeOptionsContainer.contains(event.target)) {
-                        gridSizeOptionsContainer.classList.remove('visible');
-                    }
+            }
+            if(cancelGridSizeBtn && gridSizeModal) {
+                cancelGridSizeBtn.addEventListener('click', () => {
+                    gridSizeModal.classList.remove('visible');
                 });
             }
         }
@@ -796,11 +811,12 @@
                 if (team1Button) team1Button.style.backgroundColor = newColor;
                 updateGridBackground(); 
                 
-                const selectedOption = gridSizeOptionsContainer ? gridSizeOptionsContainer.querySelector('.grid-size-option-btn.selected') : null;
-                if(selectedOption){
-                     selectedOption.style.backgroundColor = newColor; 
-                     selectedOption.style.borderColor = newColor;
+                const selectedModalOption = gridSizeOptionsModalContent ? gridSizeOptionsModalContent.querySelector('.modal-grid-size-option-btn.selected') : null;
+                if(selectedModalOption){
+                     selectedModalOption.style.backgroundColor = newColor; 
+                     selectedModalOption.style.borderColor = newColor;
                 }
+                if(confirmNameBtn) confirmNameBtn.style.backgroundColor = newColor;
             });
 
             if(team2ColorHexInput) team2ColorHexInput.addEventListener('input', (e) => {
@@ -848,7 +864,7 @@
 
         function handleNameChangeDblClick() {
             if(playerNameInput && titleLine3) playerNameInput.value = titleLine3.innerText; 
-            if(nameInputModal) nameInputModal.classList.remove('hidden'); 
+            if(nameInputModal) nameInputModal.classList.add('visible'); 
             if(playerNameInput) playerNameInput.focus(); 
         }
 
@@ -858,11 +874,11 @@
                 if(titleLine3) titleLine3.innerText = newName;
                 localStorage.setItem(PLAYER_NAME_STORAGE_KEY, newName);
             }
-            if(nameInputModal) nameInputModal.classList.add('hidden'); 
+            if(nameInputModal) nameInputModal.classList.remove('visible'); 
         });
 
         if(cancelNameBtn) cancelNameBtn.addEventListener('click', () => {
-            if(nameInputModal) nameInputModal.classList.add('hidden'); 
+            if(nameInputModal) nameInputModal.classList.remove('visible'); 
         });
 
         function showLoading(isLoading, message = "جاري التحميل...", isError = false) {
