@@ -24,16 +24,21 @@
         :root {
             /* --- الألوان --- */
             --color-bg: #8B5CF6;
-            --color-border-vertical: #34D399;
-            --color-border-horizontal: #FB923C;
+            --color-border-vertical: #34D399; /* Default Team 1 color */
+            --color-border-horizontal: #FB923C; /* Default Team 2 color */
             --color-cell-bg: #FFFFFF;
             --color-hex-outer-border: #333;
-            --color-cell-text: #000000; /* Original text color for cells */
+            --color-cell-text: #000000; 
             --color-team1: var(--color-border-vertical);
             --color-team2: var(--color-border-horizontal);
-            --color-text-light: #FFFFFF; /* Light text color, used for pulsing and answered cells */
+            --color-text-light: #FFFFFF; 
             --color-text-dark: #333333;
             --color-win-message-bg: rgba(0, 0, 0, 0.75);
+            --color-grid-size-button-bg: #f0f0f0;
+            --color-grid-size-button-text: #333333;
+            --color-grid-size-option-bg: #e9e9e9;
+            --color-grid-size-option-hover-bg: #dcdcdc;
+
 
             /* --- الأبعاد الأساسية للشكل السداسي --- */
             --hex-width: 85px;
@@ -45,17 +50,23 @@
             --hex-margin-v-overlap: calc(var(--hex-height) * -0.2);
             --hex-stagger-offset: calc(var(--hex-width) * 0.75 / 2);
 
-            --container-padding: 30px;
+            --container-padding: 20px; 
 
-            /* --- أبعاد للخلايا السداسية الزخرفية --- */
+            /* --- أبعاد للخلايا السداسية الزخرفية ولوحة النتائج --- */
             --hex-width-decorative: 55px; 
             --hex-height-decorative: calc(var(--hex-width-decorative) * 0.8660254);
+            --score-hex-width: 50px; 
+            --score-hex-height: calc(var(--score-hex-width) * 0.8660254);
+            --grid-size-hex-width: 60px;
+            --grid-size-hex-height: calc(var(--grid-size-hex-width) * 0.8660254);
+            --grid-size-option-hex-width: 40px; /* Smaller hex for options */
+            --grid-size-option-hex-height: calc(var(--grid-size-option-hex-width) * 0.8660254);
         }
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: 'AA-galaxy', sans-serif;
-            display: flex; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: flex-start; 
             min-height: 100vh; background-color: var(--color-bg); margin: 0; padding: 20px;
             position: relative; overflow-x: hidden; overflow-y: auto;
         }
@@ -72,96 +83,85 @@
             overflow: hidden; 
         }
 
-        #action-button-area {
+        .game-layout-row { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 100%;
+        }
+
+        #info-panel { 
+            order: 1; 
             display: flex;
-            justify-content: center; 
-            position: relative; 
-            z-index: 10; 
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px; 
         }
-        .action-button-style {
-            padding: 10px 15px; 
-            background-color: #4CAF50; color: white; border: none;
-            border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: auto; 
-            min-width: 130px; 
-            font-family: 'AA-galaxy', sans-serif;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .action-button-style:hover { background-color: #45a049; }
-        .copy-message {
-            font-size: 0.9rem; color: #4CAF50; opacity: 0; transition: opacity 0.3s ease;
-            position: absolute; left: 50%; 
-            transform: translateX(-50%); 
-            bottom: 100%; 
-            margin-bottom: 8px; 
-            background-color: rgba(0,0,0,0.75);
-            padding: 6px 12px; border-radius: 5px; color: white; white-space: nowrap;
-            pointer-events: none; font-family: 'AA-galaxy', sans-serif;
-            z-index: 11; 
-        }
-        .button-with-message-wrapper { 
-            position: relative; 
-            width: auto; 
-            display: inline-block; 
-        }
-        .copy-message.visible { opacity: 1; }
-
-
-        .game-layout-row {
-            display: flex; flex-direction: row; align-items: center;
-            justify-content: center; gap: 30px; margin-bottom: 30px;
-            flex-wrap: wrap; position: relative; z-index: 2;
+        
+        #header-content-wrapper { 
+            display: flex; 
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around; /* Changed to space-around for better mobile spacing */
+            width: 100%;
+            max-width: 400px; /* Slightly increased max-width for mobile */
+            margin: 0 auto 15px auto; 
         }
 
-        #game-title-and-buttons {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 20px; 
-            flex-shrink: 0;
+        .score-hex-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .score-hex {
+            width: var(--score-hex-width);
+            height: var(--score-hex-height);
+            clip-path: var(--hex-clip-path);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            color: var(--color-text-light);
+            font-weight: bold;
+            font-size: calc(var(--score-hex-width) * 0.4);
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.5); 
+        }
+        .score-hex:hover {
+            transform: scale(1.1);
+        }
+        .hidden-color-input {
+            position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; top:0; left:0;
         }
 
+        #game-title-text-wrapper { 
+            text-align: center;
+            margin: 0 5px; 
+            flex-shrink: 0; /* Prevent title from shrinking too much */
+        }
         #game-title-text {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; font-family: 'AA-galaxy', sans-serif;
-            line-height: 0.9; padding: 10px; transform: skewX(-10deg);
-            max-width: 250px; margin-left: auto; margin-right: auto;
+            line-height: 0.9; padding: 5px 0; 
+            transform: skewX(-10deg);
         }
-
         #game-title-text span {
             display: block; font-weight: bold;
             text-shadow: -1px -1px 0 #2c2c2c, 1px -1px 0 #2c2c2c, -1px 1px 0 #2c2c2c, 1px 1px 0 #2c2c2c, 2px 2px 0 #4a4a4a, 3px 3px 0 #6a6a6a;
-            white-space: nowrap; padding: 5px 0; cursor: pointer;
+            white-space: nowrap; padding: 3px 0; cursor: pointer;
             transition: transform 0.2s ease; --random-x: 0px; --random-y: 0px;
             transform: translate(var(--random-x), var(--random-y));
         }
         #game-title-text span:hover { transform: translate(var(--random-x), var(--random-y)) scale(1.05); }
-        #title-line-1 { font-size: 3.5rem; color: #FFD700; }
-        #title-line-2 { font-size: 2.5rem; color: #4FC3F7; }
-        #title-line-3 { font-size: 3.5rem; color: #EF5350; }
-
-        .color-controls {
-            display: flex; justify-content: center; align-items: center; 
-            gap: 10px 20px; 
-            flex-wrap: wrap;
-            position: relative; z-index: 2;
-        }
-        .color-controls > div { 
-            display: flex;
-            flex-direction: column; 
-            align-items: center;
-            gap: 5px;
-        }
-        .color-controls label { font-weight: bold; color: var(--color-text-dark); font-family: 'AA-galaxy', sans-serif; }
-        .color-controls input[type="color"] { 
-            width: 50px;
-            height: 30px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
+        #title-line-1 { font-size: 3rem; color: #FFD700; }
+        #title-line-2 { font-size: 2rem; color: #4FC3F7; }
+        #title-line-3 { font-size: 3rem; color: #EF5350; }
 
 
         #grid-layout-container {
+            order: 2; 
             position: relative; padding: calc(var(--hex-height) * 0.75); width: fit-content;
             margin: 0 auto; border-radius: 15px; overflow: hidden; flex-shrink: 0;
         }
@@ -194,7 +194,7 @@
             font-size: calc(var(--hex-width) * 0.45); max-width: calc(var(--hex-width) * 0.75);
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             font-weight: bold; user-select: none; text-align: center; 
-            color: var(--color-cell-text); /* Default text color */
+            color: var(--color-cell-text); 
             font-family: 'AA-galaxy' !important;
             transition: color 0.1s ease-out; 
         }
@@ -215,16 +215,15 @@
             100% { color: var(--color-cell-text); } 
         }
         .grid-cell .cell-content.selected-text-pulse {
-            animation: textColorPulse 1s infinite; /* Updated duration to 1s */
+            animation: textColorPulse 1s infinite;
         }
-
 
         #team-buttons-area {
-            display: flex; flex-direction: column; justify-content: center; gap: 15px;
-            flex-wrap: wrap; min-height: 50px;
+            display: flex; flex-direction: column; justify-content: center; gap: 10px; 
+            flex-wrap: wrap; min-height: 50px; width: 100%; max-width: 250px; margin-top: 0; 
         }
         #team-buttons-area button {
-            padding: 10px 20px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;
+            padding: 8px 15px; border: none; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
             color: var(--color-text-light); font-weight: bold; transition: background-color 0.3s ease, opacity 0.3s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-family: 'AA-galaxy', sans-serif;
         }
@@ -232,6 +231,109 @@
         #team-buttons-area .button-team1 { background-color: var(--color-team1); }
         #team-buttons-area .button-team2 { background-color: var(--color-team2); }
         #team-buttons-area .button-cancel { background-color: #EF4444; }
+        
+        #page-controls-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            align-items: center;
+            gap: 15px; 
+            width: 100%; margin-top: 25px; margin-bottom: 15px; padding: 0 10px; 
+        }
+        #action-button-area, #grid-size-control-area { 
+            display: flex; 
+            justify-content: center;
+            position: relative; 
+        }
+        .action-button-style {
+            padding: 10px 15px; background-color: #4CAF50; color: white; border: none;
+            border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: auto; min-width: 130px; font-family: 'AA-galaxy', sans-serif;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-button-style:hover { background-color: #45a049; }
+        .copy-message {
+            font-size: 0.9rem; color: #4CAF50; opacity: 0; transition: opacity 0.3s ease;
+            position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; 
+            margin-bottom: 8px; background-color: rgba(0,0,0,0.75);
+            padding: 6px 12px; border-radius: 5px; color: white; white-space: nowrap;
+            pointer-events: none; font-family: 'AA-galaxy', sans-serif; z-index: 11; 
+        }
+        .button-with-message-wrapper { position: relative; width: auto; display: inline-block; }
+        .copy-message.visible { opacity: 1; }
+
+        /* Grid Size Control Button */
+        #grid-size-button {
+            width: var(--grid-size-hex-width);
+            height: var(--grid-size-hex-height);
+            background-color: var(--color-grid-size-button-bg);
+            color: var(--color-grid-size-button-text);
+            clip-path: var(--hex-clip-path);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: calc(var(--grid-size-hex-width) * 0.35);
+            font-weight: bold;
+            font-family: 'AA-galaxy', sans-serif;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s ease;
+        }
+        #grid-size-button:hover {
+            background-color: #e0e0e0;
+        }
+        #grid-size-options {
+            position: absolute;
+            bottom: calc(100% + 10px); 
+            left: 50%;
+            background-color: rgba(255, 255, 255, 0.95); 
+            border-radius: 10px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
+            padding: 10px;
+            z-index: 20;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--grid-size-option-hex-width), 1fr)); 
+            gap: 8px; 
+            width: auto; 
+            max-width: calc( (var(--grid-size-option-hex-width) + 8px) * 4 ); 
+            opacity: 0; 
+            visibility: hidden;
+            transition: opacity 0.2s ease-out, visibility 0.2s ease-out, transform 0.2s ease-out;
+            transform: translateX(-50%) translateY(10px); 
+        }
+        #grid-size-options.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .grid-size-option-btn {
+            width: var(--grid-size-option-hex-width);
+            height: var(--grid-size-option-hex-height);
+            background-color: var(--color-grid-size-option-bg);
+            color: var(--color-grid-size-button-text);
+            clip-path: var(--hex-clip-path); 
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            font-family: 'AA-galaxy', sans-serif;
+            font-size: calc(var(--grid-size-option-hex-width) * 0.4);
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #bbb; 
+            transition: background-color 0.2s ease, transform 0.15s ease;
+        }
+        .grid-size-option-btn:hover {
+            background-color: var(--color-grid-size-option-hover-bg);
+            transform: scale(1.05); 
+        }
+        .grid-size-option-btn.selected {
+            background-color: var(--color-team1);
+            color: var(--color-text-light);
+            border-color: var(--color-team1);
+            transform: scale(1.05);
+        }
+
 
         #loading {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 1.3em; text-align: center;
@@ -247,8 +349,8 @@
         }
         #win-overlay.visible { opacity: 1; visibility: visible; }
         .win-message-text {
-            font-size: 4rem; font-weight: bold; margin-bottom: 20px; animation: pulse 1.5s infinite;
-            font-family: 'AA-galaxy', sans-serif;
+            font-size: 3.5rem; font-weight: bold; margin-bottom: 20px; animation: pulse 1.5s infinite;
+            font-family: 'AA-galaxy', sans-serif; text-align: center; padding: 0 10px;
         }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .restart-button {
@@ -257,7 +359,6 @@
             font-family: 'AA-galaxy', sans-serif;
         }
         .restart-button:hover { background-color: #eee; }
-
 
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7);
@@ -291,169 +392,135 @@
         .modal-buttons button.cancel-btn { background-color: #EF4444; color: white; }
         .modal-buttons button.cancel-btn:hover { background-color: #dc2626; transform: translateY(-2px); }
 
-        .decorative-hex-grid {
-            position: absolute;
-            z-index: 0; 
-            pointer-events: none; 
-        }
-        .decorative-hex-grid .hex-row {
-            display: flex;
-            margin-bottom: calc(var(--hex-height-decorative) * -0.2);
-        }
-        .decorative-hex-grid .hex-row:nth-child(even) {
-            margin-inline-start: calc(var(--hex-width-decorative) * 0.75 / 2);
-        }
+        .decorative-hex-grid { position: absolute; z-index: 0; pointer-events: none; }
+        .decorative-hex-grid .hex-row { display: flex; margin-bottom: calc(var(--hex-height-decorative) * -0.2); }
+        .decorative-hex-grid .hex-row:nth-child(even) { margin-inline-start: calc(var(--hex-width-decorative) * 0.75 / 2); }
         .decorative-hex-grid .grid-cell {
-            position: relative;
-            width: var(--hex-width-decorative);
-            height: var(--hex-height-decorative);
-            background-color: rgba(180, 180, 180, 0.35); 
-            clip-path: var(--hex-clip-path); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: calc(var(--hex-width-decorative) * -0.1);
-            box-sizing: border-box;
+            position: relative; width: var(--hex-width-decorative); height: var(--hex-height-decorative);
+            background-color: rgba(180, 180, 180, 0.35); clip-path: var(--hex-clip-path); 
+            display: flex; justify-content: center; align-items: center;
+            margin-right: calc(var(--hex-width-decorative) * -0.1); box-sizing: border-box;
         }
         .decorative-hex-grid .grid-cell:last-child { margin-right: 0; }
         .decorative-hex-grid .grid-cell:hover { transform: none; z-index: auto; }
         .decorative-hex-grid .cell-content {
-            font-size: calc(var(--hex-width-decorative) * 0.45);
-            color: rgba(100, 100, 100, 0.6); 
-            font-weight: normal; 
-            user-select: none;
-            text-align: center;
+            font-size: calc(var(--hex-width-decorative) * 0.45); color: rgba(100, 100, 100, 0.6); 
+            font-weight: normal; user-select: none; text-align: center;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             max-width: calc(var(--hex-width-decorative) * 0.75);
         }
-
-        #decorative-grid-top-left {
-            top: -65px; 
-            left: -65px; 
-            transform: rotate(-18deg); 
-            opacity: 0.55; 
-        }
-        #decorative-grid-bottom-right {
-            bottom: -65px; 
-            right: -65px;   
-            transform: rotate(18deg);
-            opacity: 0.55; 
-        }
-
-        #page-controls-container {
-            display: flex;
-            flex-direction: column; 
-            align-items: center;
-            gap: 20px; 
-            width: 100%;
-            margin-top: 20px; 
-            margin-bottom: 30px; 
-            padding: 0 10px; 
-        }
-
+        #decorative-grid-top-left { top: -65px; left: -65px; transform: rotate(-18deg); opacity: 0.55; }
+        #decorative-grid-bottom-right { bottom: -65px; right: -65px; transform: rotate(18deg); opacity: 0.55; }
 
         /* --- Responsive --- */
         @media (min-width: 768px) { 
-            #page-controls-container {
+            .game-layout-row {
                 flex-direction: row; 
+                align-items: flex-start; 
                 justify-content: center; 
                 gap: 30px; 
             }
-            .color-controls {
-                gap: 20px; 
+            #info-panel {
+                order: 1; 
+                flex-shrink: 0; 
+                width: auto; 
+                margin-bottom: 0; 
+                align-items: center; /* Center items in info-panel */
             }
-             .color-controls > div {
-                flex-direction: row; 
-                align-items: center;
-             }
+            #grid-layout-container {
+                order: 2; 
+                margin-left: auto; /* Push grid to the right if info-panel is smaller */
+                margin-right: auto; /* Center grid if info-panel is larger or equal */
+            }
+            #header-content-wrapper { 
+                display: grid; 
+                grid-template-areas: 
+                    "hex1 hex2"
+                    "title title";
+                grid-template-columns: auto auto; 
+                gap: 10px 15px; 
+                justify-items: center; 
+                width: auto; 
+                max-width: none; 
+                margin-bottom: 15px; 
+            }
+            #team1-score-hex-wrapper { grid-area: hex1; }
+            #team2-score-hex-wrapper { grid-area: hex2; }
+            #game-title-text-wrapper { grid-area: title; margin:0; } 
+
+            :root {
+                 --score-hex-width: 55px; 
+                 --hex-width: 75px;
+                 --grid-size-hex-width: 70px;
+                 --grid-size-option-hex-width: 45px;
+            }
+            #title-line-1 { font-size: 3.2rem; } 
+            #title-line-2 { font-size: 2.2rem; } 
+            #title-line-3 { font-size: 3.2rem; }
+            .win-message-text { font-size: 4rem; }
+            #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
+            #grid-size-options { bottom: calc(100% + 10px); top: auto; } 
+        }
+        
+        @media (max-width: 900px) and (min-width: 768px) { 
+             :root {
+                 --score-hex-width: 50px; 
+                 --hex-width: 70px;
+                 --grid-size-hex-width: 65px;
+                 --grid-size-option-hex-width: 42px;
+            }
+            #title-line-1 { font-size: 3rem; } 
+            #title-line-2 { font-size: 2rem; } 
+            #title-line-3 { font-size: 3rem; }
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 767.98px) { 
             :root { 
                 --hex-width: 50px; 
                 --hex-width-decorative: 40px; 
+                --score-hex-width: 45px;
+                --grid-size-hex-width: 55px;
+                --grid-size-option-hex-width: 38px;
             }
-            #game-title-text { max-width: 200px; }
-            #title-line-1 { font-size: 3rem; } #title-line-2 { font-size: 2rem; } #title-line-3 { font-size: 3rem; }
+            #header-content-wrapper { justify-content: space-around; } /* Ensure space around for mobile */
+            #game-title-text-wrapper { flex-grow: 1; text-align: center; }
+            #game-title-text { max-width: 180px; margin: 0 auto; } 
+            #title-line-1 { font-size: 2.5rem; } #title-line-2 { font-size: 1.7rem; } #title-line-3 { font-size: 2.5rem; }
             .action-button-style { min-width: 120px; padding: 8px 15px; font-size: 0.9em;} 
-            #team-buttons-area { gap: 10px; }
             #team-buttons-area button { min-width: 100px; padding: 7px 14px; font-size: 0.9em;}
             .cell-content { font-size: calc(var(--hex-width) * 0.46); }
-            
-            #decorative-grid-top-left {
-                top: -50px; 
-                left: -50px;
-                transform: rotate(-18deg); 
-            }
-            #decorative-grid-bottom-right { 
-                bottom: -50px; 
-                right: -50px;  
-            }
-        }
-        @media (max-width: 700px) {
-            :root { 
-                --hex-width: 42px; 
-                --hex-width-decorative: 30px; 
-            }
-            .cell-content { font-size: calc(var(--hex-width) * 0.48); }
-            #game-title-text { max-width: 180px; }
-            #title-line-1 { font-size: 2.5rem; } #title-line-2 { font-size: 1.8rem; } #title-line-3 { font-size: 2.5rem; }
-            .action-button-style { min-width: 120px; padding: 7px 12px; font-size: 0.8em;} 
-            #team-buttons-area { gap: 6px; }
-            #team-buttons-area button { min-width: 85px; padding: 6px 12px; font-size: 0.8em;}
-
-            #decorative-grid-top-left { 
-                top: -35px; 
-                left: -35px; 
-                transform: rotate(-18deg); 
-            }
-            #decorative-grid-bottom-right { 
-                bottom: -35px; 
-                right: -35px;  
+            #decorative-grid-top-left { top: -50px; left: -50px; transform: rotate(-18deg); }
+            #decorative-grid-bottom-right { bottom: -50px; right: -50px; }
+            .win-message-text { font-size: 2.8rem; }
+            #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.38); }
+            #grid-size-options {
+                bottom: auto; 
+                top: calc(100% + 8px); 
+                max-width: calc( (var(--grid-size-option-hex-width) + 8px) * 5 ); 
             }
         }
-        @media (max-width: 550px) {
-            body { display: block; padding-top: 15px; }
+        @media (max-width: 550px) { 
+            body { display: block; padding-top: 15px; } 
             :root { 
-                --hex-width: 35px; 
+                --hex-width: 38px; 
                 --hex-width-decorative: 25px; 
+                --score-hex-width: 38px; 
+                --grid-size-hex-width: 50px;
+                --grid-size-option-hex-width: 35px;
             }
+            #header-content-wrapper { max-width: 320px; justify-content: space-between; } /* space-between for smallest */
             .cell-content { font-size: calc(var(--hex-width) * 0.5); }
-            .game-layout-row { flex-direction: column; align-items: center; gap: 20px; }
-            #game-title-and-buttons { width: 100%; margin-bottom: 20px; gap: 15px; }
-            #game-title-text { max-width: 150px; margin: 0 auto; }
-            #title-line-1 { font-size: 2rem; } #title-line-2 { font-size: 1.5rem; } #title-line-3 { font-size: 2rem; }
-            
-            #team-buttons-area {
-                position: relative; left: auto; right: auto; top: auto; transform: none;
-                width: 95%; max-width: 300px; margin: 0 auto; 
-                z-index: 5;
-                flex-direction: column; justify-content: center; 
-            }
-            .action-button-style { 
-                 width: auto; 
-                 min-width: 120px; 
-                 padding: 8px 15px; 
-            } 
-            #page-controls-container {
-                 gap: 15px; 
-            }
-            .color-controls > div { 
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            #decorative-grid-top-left {
-                top: -30px; 
-                left: -30px; 
-                transform: rotate(-15deg); 
-                opacity: 0.5; 
-            }
-            #decorative-grid-bottom-right {
-                bottom: -30px; 
-                right: -30px;  
-                transform: rotate(15deg);
-                opacity: 0.45;
+            #game-title-text { max-width: 130px; }
+            #title-line-1 { font-size: 2rem; } #title-line-2 { font-size: 1.4rem; } #title-line-3 { font-size: 2rem; }
+            .action-button-style { min-width: 110px; padding: 7px 12px; font-size: 0.8em;} 
+            #team-buttons-area { gap: 6px; max-width: 200px; }
+            #team-buttons-area button { min-width: 85px; padding: 6px 12px; font-size: 0.8em;}
+            #decorative-grid-top-left { top: -30px; left: -30px; transform: rotate(-15deg); opacity: 0.5; }
+            #decorative-grid-bottom-right { bottom: -30px; right: -30px; transform: rotate(15deg); opacity: 0.45; }
+            .win-message-text { font-size: 2.2rem; }
+            #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
+             #grid-size-options {
+                max-width: calc( (var(--grid-size-option-hex-width) + 8px) * 4 ); 
             }
         }
     </style>
@@ -465,11 +532,27 @@
         <div id="decorative-grid-bottom-right" class="decorative-hex-grid"></div>
 
         <div class="game-layout-row">
-            <div id="game-title-and-buttons">
-                <div id="game-title-text">
-                    <span id="title-line-1">حروف</span>
-                    <span id="title-line-2">مع</span>
-                    <span id="title-line-3">خبزة</span> 
+            <div id="info-panel">
+                <div id="header-content-wrapper">
+                    <div id="team1-score-hex-wrapper" class="score-hex-wrapper">
+                        <div id="team1-score-hex" class="score-hex" data-team="1">
+                            <span id="team1-score" class="score-text">0</span>
+                            <input type="color" id="team1ColorHexInput" class="hidden-color-input" value="#34D399">
+                        </div>
+                    </div>
+                    <div id="game-title-text-wrapper">
+                        <div id="game-title-text">
+                            <span id="title-line-1">حروف</span>
+                            <span id="title-line-2">مع</span>
+                            <span id="title-line-3">خبزة</span> 
+                        </div>
+                    </div>
+                    <div id="team2-score-hex-wrapper" class="score-hex-wrapper">
+                        <div id="team2-score-hex" class="score-hex" data-team="2">
+                            <span id="team2-score" class="score-text">0</span>
+                            <input type="color" id="team2ColorHexInput" class="hidden-color-input" value="#FB923C">
+                        </div>
+                    </div>
                 </div>
                 <div id="team-buttons-area">
                 </div>
@@ -482,24 +565,20 @@
         </div>
         
         <div id="page-controls-container">
-            <div id="action-button-area"> <div class="button-with-message-wrapper">
+            <div id="action-button-area"> 
+                <div class="button-with-message-wrapper">
                     <button id="copyAndNavigateButton" class="action-button-style">
                         <i class="far fa-copy"></i>
                         <i class="fas fa-external-link-alt"></i>
-                        <span>الأسئلة</span> </button>
+                        <span>الأسئلة</span> 
+                    </button>
                     <span id="copyMessage" class="copy-message">تم النسخ!</span>
                 </div>
             </div>
-
-            <div class="color-controls">
-                <div>
-                    <label for="team1Color">الفريق الأول:</label>
-                    <input type="color" id="team1Color" value="#34D399">
-                </div>
-                <div>
-                    <label for="team2Color">الفريق الثاني:</label>
-                    <input type="color" id="team2Color" value="#FB923C">
-                </div>
+            <div id="grid-size-control-area">
+                <div id="grid-size-button" title="تغيير حجم الشبكة">6</div>
+                <div id="grid-size-options">
+                    </div>
             </div>
         </div>
     </div>
@@ -523,8 +602,11 @@
 
     <script>
         // --- Configuration ---
-        const gridRows = 6; 
-        const gridCols = 6; 
+        const MIN_GRID_SIZE = 3;
+        const MAX_GRID_SIZE = 9;
+        let currentGridSize = 6; // Default grid size
+        let gridRows = currentGridSize; 
+        let gridCols = currentGridSize; 
 
         // --- Global State & Constants ---
         let letters = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي"; 
@@ -538,6 +620,8 @@
         const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; 
         let titleAnimationIntervalId = null; 
         let currentlySelectedCellContent = null; 
+        let team1Score = 0; 
+        let team2Score = 0; 
 
         // --- DOM Elements ---
         const loadingDiv = document.getElementById('loading');
@@ -546,7 +630,6 @@
         const winOverlay = document.getElementById('win-overlay');
         const winMessageText = document.getElementById('winMessageText');
         const restartButton = document.getElementById('restartButton');
-        const gameTitleTextDiv = document.getElementById('game-title-text');
         const titleLine3 = document.getElementById('title-line-3');
         const copyAndNavigateButton = document.getElementById('copyAndNavigateButton');
         const copyMessage = document.getElementById('copyMessage');
@@ -557,24 +640,57 @@
         const decorativeGridTL = document.getElementById('decorative-grid-top-left');
         const decorativeGridBR = document.getElementById('decorative-grid-bottom-right');
 
+        const team1ScoreHex = document.getElementById('team1-score-hex');
+        const team2ScoreHex = document.getElementById('team2-score-hex');
+        const team1ScoreDisplay = document.getElementById('team1-score');
+        const team2ScoreDisplay = document.getElementById('team2-score');
+        const team1ColorHexInput = document.getElementById('team1ColorHexInput');
+        const team2ColorHexInput = document.getElementById('team2ColorHexInput');
+
+        const gridSizeButton = document.getElementById('grid-size-button');
+        const gridSizeOptionsContainer = document.getElementById('grid-size-options');
+
+
         window.addEventListener('load', initialize);
 
         function initialize() {
-            console.log("Initializing game (Honeycomb Layout, all features)...");
+            console.log("Initializing game with grid size:", currentGridSize);
             showLoading(true, "جاري تهيئة اللعبة...");
-            hexGrid.innerHTML = ''; 
-            hexGrid.style.display = 'none'; 
-            teamButtonsArea.style.display = 'none'; 
-            winOverlay.classList.remove('visible'); 
-            nameInputModal.classList.add('hidden'); 
+
+            gridRows = currentGridSize;
+            gridCols = currentGridSize;
+
+            if(gridSizeButton) gridSizeButton.textContent = currentGridSize;
+            createGridSizeOptions(); 
+
+            if(hexGrid) {
+                hexGrid.innerHTML = ''; 
+                hexGrid.style.display = 'none'; 
+            }
+            if(teamButtonsArea) teamButtonsArea.style.display = 'none'; 
+            if(winOverlay) winOverlay.classList.remove('visible'); 
+            if(nameInputModal) nameInputModal.classList.add('hidden'); 
             gameIsOver = false;
             
+            updateScoreDisplay(); // Update score display at initialization
+            
+            const rootStyles = getComputedStyle(document.documentElement);
+            const initialTeam1Color = rootStyles.getPropertyValue('--color-team1').trim();
+            const initialTeam2Color = rootStyles.getPropertyValue('--color-team2').trim();
+
+            if(team1ColorHexInput) team1ColorHexInput.value = initialTeam1Color;
+            if(team2ColorHexInput) team2ColorHexInput.value = initialTeam2Color;
+            if(team1ScoreHex) team1ScoreHex.style.backgroundColor = initialTeam1Color;
+            if(team2ScoreHex) team2ScoreHex.style.backgroundColor = initialTeam2Color;
+
+
             if (currentlySelectedCellContent) {
                 currentlySelectedCellContent.classList.remove('selected-text-pulse');
             }
             currentlySelectedCellContent = null; 
 
-            if (gameTitleTextDiv) {
+            const gameTitleTextDiv = document.getElementById('game-title-text');
+            if (gameTitleTextDiv) { 
                 gameTitleTextDiv.style.display = 'flex'; 
             }
 
@@ -592,11 +708,115 @@
             if (decorativeGridBR) {
                 createDecorativeGrid(decorativeGridBR, 5, 5); 
             }
+            
+            setupColorPickers(); 
+            setupGridSizeControls(); 
 
             showLoading(false); 
             startTitleAnimation(); 
-            console.log("Grid populated. Decorative grids created and styled. Ready. Title animation started.");
+            console.log("Initialization complete.");
         }
+
+        function createGridSizeOptions() {
+            if (!gridSizeOptionsContainer) return;
+            gridSizeOptionsContainer.innerHTML = ''; 
+            for (let i = MIN_GRID_SIZE; i <= MAX_GRID_SIZE; i++) {
+                const optionBtn = document.createElement('button');
+                optionBtn.classList.add('grid-size-option-btn');
+                optionBtn.textContent = i;
+                if (i === currentGridSize) {
+                    optionBtn.classList.add('selected');
+                     // Apply team 1 color to the selected button initially
+                    optionBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
+                    optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
+                    optionBtn.style.color = 'var(--color-text-light)';
+                }
+                optionBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent click from bubbling to document and closing immediately
+                    currentGridSize = i;
+                    if(gridSizeButton) gridSizeButton.textContent = currentGridSize;
+                    
+                    // Update selected class
+                    gridSizeOptionsContainer.querySelectorAll('.grid-size-option-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                        btn.style.backgroundColor = ''; // Reset non-selected to default
+                        btn.style.borderColor = '';
+                        btn.style.color = '';
+                    });
+                    optionBtn.classList.add('selected');
+                    optionBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
+                    optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
+                    optionBtn.style.color = 'var(--color-text-light)';
+
+                    gridSizeOptionsContainer.classList.remove('visible'); 
+                    
+                    team1Score = 0;
+                    team2Score = 0;
+                    updateScoreDisplay();
+                    
+                    initialize(); 
+                });
+                gridSizeOptionsContainer.appendChild(optionBtn);
+            }
+        }
+
+        function setupGridSizeControls() {
+            if (gridSizeButton && gridSizeOptionsContainer) {
+                gridSizeButton.addEventListener('click', (event) => {
+                    event.stopPropagation(); 
+                    gridSizeOptionsContainer.classList.toggle('visible');
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (gridSizeOptionsContainer.classList.contains('visible') && 
+                        !gridSizeButton.contains(event.target) && 
+                        !gridSizeOptionsContainer.contains(event.target)) {
+                        gridSizeOptionsContainer.classList.remove('visible');
+                    }
+                });
+            }
+        }
+        
+        function updateScoreDisplay() {
+            if (team1ScoreDisplay) team1ScoreDisplay.innerText = team1Score;
+            if (team2ScoreDisplay) team2ScoreDisplay.innerText = team2Score;
+        }
+
+        function setupColorPickers() {
+            if(team1ScoreHex && team1ColorHexInput) team1ScoreHex.addEventListener('click', () => team1ColorHexInput.click());
+            if(team2ScoreHex && team2ColorHexInput) team2ScoreHex.addEventListener('click', () => team2ColorHexInput.click());
+
+            if(team1ColorHexInput) team1ColorHexInput.addEventListener('input', (e) => {
+                const newColor = e.target.value;
+                document.documentElement.style.setProperty('--color-team1', newColor);
+                if(team1ScoreHex) team1ScoreHex.style.backgroundColor = newColor; 
+                document.querySelectorAll('.grid-cell.answered-team1').forEach(cell => {
+                    cell.style.backgroundColor = newColor; cell.style.borderColor = newColor;
+                });
+                const team1Button = teamButtonsArea ? teamButtonsArea.querySelector('.button-team1') : null;
+                if (team1Button) team1Button.style.backgroundColor = newColor;
+                updateGridBackground(); 
+                
+                const selectedOption = gridSizeOptionsContainer ? gridSizeOptionsContainer.querySelector('.grid-size-option-btn.selected') : null;
+                if(selectedOption){
+                     selectedOption.style.backgroundColor = newColor; 
+                     selectedOption.style.borderColor = newColor;
+                }
+            });
+
+            if(team2ColorHexInput) team2ColorHexInput.addEventListener('input', (e) => {
+                const newColor = e.target.value;
+                document.documentElement.style.setProperty('--color-team2', newColor);
+                if(team2ScoreHex) team2ScoreHex.style.backgroundColor = newColor; 
+                document.querySelectorAll('.grid-cell.answered-team2').forEach(cell => {
+                    cell.style.backgroundColor = newColor; cell.style.borderColor = newColor;
+                });
+                const team2Button = teamButtonsArea ? teamButtonsArea.querySelector('.button-team2') : null;
+                if (team2Button) team2Button.style.backgroundColor = newColor;
+                updateGridBackground(); 
+            });
+        }
+
 
         function startTitleAnimation() {
             if (titleAnimationIntervalId) {
@@ -624,42 +844,52 @@
 
         function loadPlayerName() {
             const savedName = localStorage.getItem(PLAYER_NAME_STORAGE_KEY);
-            titleLine3.innerText = savedName || DEFAULT_PLAYER_NAME;
+            if(titleLine3) titleLine3.innerText = savedName || DEFAULT_PLAYER_NAME;
         }
 
         function handleNameChangeDblClick() {
-            playerNameInput.value = titleLine3.innerText; 
-            nameInputModal.classList.remove('hidden'); 
-            playerNameInput.focus(); 
+            if(playerNameInput && titleLine3) playerNameInput.value = titleLine3.innerText; 
+            if(nameInputModal) nameInputModal.classList.remove('hidden'); 
+            if(playerNameInput) playerNameInput.focus(); 
         }
 
-        confirmNameBtn.addEventListener('click', () => {
-            const newName = playerNameInput.value.trim();
+        if(confirmNameBtn) confirmNameBtn.addEventListener('click', () => {
+            const newName = playerNameInput ? playerNameInput.value.trim() : "";
             if (newName !== "") {
-                titleLine3.innerText = newName;
+                if(titleLine3) titleLine3.innerText = newName;
                 localStorage.setItem(PLAYER_NAME_STORAGE_KEY, newName);
             }
-            nameInputModal.classList.add('hidden'); 
+            if(nameInputModal) nameInputModal.classList.add('hidden'); 
         });
 
-        cancelNameBtn.addEventListener('click', () => {
-            nameInputModal.classList.add('hidden'); 
+        if(cancelNameBtn) cancelNameBtn.addEventListener('click', () => {
+            if(nameInputModal) nameInputModal.classList.add('hidden'); 
         });
 
         function showLoading(isLoading, message = "جاري التحميل...", isError = false) {
-            loadingDiv.innerText = message;
-            loadingDiv.style.display = isLoading ? 'block' : 'none';
-            loadingDiv.classList.toggle('error-message', isError);
+            if(loadingDiv) {
+                loadingDiv.innerText = message;
+                loadingDiv.style.display = isLoading ? 'block' : 'none';
+                loadingDiv.classList.toggle('error-message', isError);
+            }
             
-            hexGrid.style.display = (!isLoading && !isError) ? 'flex' : 'none'; 
-            if (isLoading || isError) {
+            if(hexGrid) hexGrid.style.display = (!isLoading && !isError) ? 'flex' : 'none'; 
+            if (teamButtonsArea && (isLoading || isError)) {
                 teamButtonsArea.style.display = 'none'; 
             }
         }
 
         function populateGrid() {
+            if(!hexGrid) return;
             hexGrid.innerHTML = '';
-            const shuffledLetters = shuffleArray(letters.split('')); 
+            let currentLetters = letters.split('');
+            const requiredLetters = gridRows * gridCols;
+            let displayLetters = [];
+            for(let i = 0; i < requiredLetters; i++) {
+                displayLetters.push(currentLetters[i % currentLetters.length]);
+            }
+            const shuffledLetters = shuffleArray(displayLetters); 
+
 
             for (let r = 0; r < gridRows; r++) {
                 const rowDiv = document.createElement('div');
@@ -673,7 +903,7 @@
 
                     const contentDiv = document.createElement('div');
                     contentDiv.classList.add('cell-content');
-                    contentDiv.innerText = shuffledLetters[(r * gridCols + c) % shuffledLetters.length]; 
+                    contentDiv.innerText = shuffledLetters[r * gridCols + c];
                     cell.dataset.letter = contentDiv.innerText; 
                     
                     cell.appendChild(contentDiv);
@@ -685,6 +915,7 @@
         }
 
         function createDecorativeGrid(containerElement, numRows, numCols) {
+            if(!containerElement) return;
             containerElement.innerHTML = ''; 
             const shuffledLetters = shuffleArray(letters.split('')); 
 
@@ -706,7 +937,7 @@
 
         function handleCellClick(event) {
             if (gameIsOver) {
-                teamButtonsArea.innerHTML = "";
+                if(teamButtonsArea) teamButtonsArea.innerHTML = "";
                 return;
             }
             const cell = event.currentTarget;
@@ -716,12 +947,13 @@
             if (currentlySelectedCellContent && currentlySelectedCellContent !== cellContent) {
                 currentlySelectedCellContent.classList.remove('selected-text-pulse');
             }
-
+            
+            if(!teamButtonsArea) return;
             teamButtonsArea.innerHTML = ''; 
             teamButtonsArea.style.display = 'flex';
 
             if (cell.classList.contains(team1Class) || cell.classList.contains(team2Class)) {
-                if (currentlySelectedCellContent === cellContent) { 
+                if (currentlySelectedCellContent === cellContent && cellContent) { 
                     cellContent.classList.remove('selected-text-pulse');
                 }
                 currentlySelectedCellContent = null; 
@@ -733,7 +965,7 @@
                 teamButtonsArea.appendChild(cancelButton);
 
             } else {
-                if (currentlySelectedCellContent === cellContent) {
+                if (currentlySelectedCellContent === cellContent && cellContent) {
                     cellContent.classList.remove('selected-text-pulse');
                     currentlySelectedCellContent = null;
                     teamButtonsArea.innerHTML = ''; 
@@ -747,10 +979,12 @@
                     const btn1 = document.createElement('button');
                     btn1.className = 'button-team1';
                     btn1.innerText = 'الفريق الأول أجاب';
+                    btn1.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     btn1.onclick = () => setUserChoice(team1Class);
                     const btn2 = document.createElement('button');
                     btn2.className = 'button-team2';
                     btn2.innerText = 'الفريق الثاني أجاب';
+                    btn2.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team2').trim();
                     btn2.onclick = () => setUserChoice(team2Class);
                     teamButtonsArea.appendChild(btn1);
                     teamButtonsArea.appendChild(btn2);
@@ -771,9 +1005,11 @@
             if (targetCell && !targetCell.classList.contains(team1Class) && !targetCell.classList.contains(team2Class)) {
                 targetCell.classList.add(chosenTeamClass);
                 if (targetCellContent) targetCellContent.style.display = 'none'; 
-                checkWinCondition();
-                teamButtonsArea.innerHTML = ''; 
-                teamButtonsArea.style.display = 'none'; 
+                checkWinCondition(); 
+                if(teamButtonsArea) {
+                    teamButtonsArea.innerHTML = ''; 
+                    teamButtonsArea.style.display = 'none'; 
+                }
             }
             currentClickedCellId = null;
         }
@@ -791,8 +1027,10 @@
             if (targetCell && (targetCell.classList.contains(team1Class) || targetCell.classList.contains(team2Class))) {
                 targetCell.classList.remove(team1Class, team2Class);
                 if (targetCellContent) targetCellContent.style.display = 'block'; 
-                teamButtonsArea.innerHTML = ''; 
-                teamButtonsArea.style.display = 'none'; 
+                if(teamButtonsArea) {
+                    teamButtonsArea.innerHTML = ''; 
+                    teamButtonsArea.style.display = 'none'; 
+                }
             }
             currentClickedCellId = null;
         }
@@ -810,12 +1048,16 @@
             const isEvenRow = (r % 2 === 0); 
             let potentialNeighbors;
             if (isEvenRow) { 
-                potentialNeighbors = [[r,c-1],[r,c+1],[r-1,c],[r-1,c-1],[r+1,c],[r+1,c-1]];
+                potentialNeighbors = [
+                    [r, c - 1], [r, c + 1], [r - 1, c], [r - 1, c - 1], [r + 1, c], [r + 1, c - 1]
+                ];
             } else { 
-                potentialNeighbors = [[r,c-1],[r,c+1],[r-1,c+1],[r-1,c],[r+1,c+1],[r+1,c]];
+                potentialNeighbors = [
+                    [r, c - 1], [r, c + 1], [r - 1, c + 1], [r - 1, c], [r + 1, c + 1], [r + 1, c]
+                ];
             }
             potentialNeighbors.forEach(([nr, nc]) => {
-                if (nr >= 0 && nr < gridRows && nc >= 0 && nc < gridCols) {
+                if (nr >= 0 && nr < gridRows && nc >= 0 && nc < gridCols) { 
                     const neighborId = `cell-${nr}-${nc}`;
                     if (document.getElementById(neighborId)) { 
                         neighbors.push(neighborId);
@@ -826,34 +1068,48 @@
         }
 
         function checkWinCondition() {
-            if (checkForPath(team1Class, 'row')) {
+            if (checkForPath(team1Class, 'row')) { 
+                team1Score++;
+                updateScoreDisplay();
                 announceWinner("الفريق الأول فاز!", team1Class); return;
             }
-            if (checkForPath(team2Class, 'col')) {
+            if (checkForPath(team2Class, 'col')) { 
+                team2Score++;
+                updateScoreDisplay();
                 announceWinner("الفريق الثاني فاز!", team2Class); return;
             }
         }
 
         function checkForPath(teamClass, dimension) {
-            const queue = []; const visited = new Set(); let startCells = [];
+            const queue = []; 
+            const visited = new Set(); 
+            let startCells = [];
+
             if (dimension === 'row') { 
-                for (let c_idx = 0; c_idx < gridCols; c_idx++) {
+                for (let c_idx = 0; c_idx < gridCols; c_idx++) { 
                     const cell = document.getElementById(`cell-0-${c_idx}`); 
                     if (cell && cell.classList.contains(teamClass)) startCells.push(cell);
                 }
             } else { 
-                for (let r_idx = 0; r_idx < gridRows; r_idx++) {
+                for (let r_idx = 0; r_idx < gridRows; r_idx++) { 
                     const cell = document.getElementById(`cell-${r_idx}-0`); 
                     if (cell && cell.classList.contains(teamClass)) startCells.push(cell);
                 }
             }
-            startCells.forEach(cell => { if (!visited.has(cell.id)) { queue.push(cell); visited.add(cell.id); } });
+
+            startCells.forEach(cell => { if (cell && !visited.has(cell.id)) { queue.push(cell); visited.add(cell.id); } });
+            
             if (queue.length === 0) return false;
+
             while (queue.length > 0) {
                 const currentCell = queue.shift();
-                const r = parseInt(currentCell.dataset.row); const c = parseInt(currentCell.dataset.col);
+                if(!currentCell) continue; 
+                const r = parseInt(currentCell.dataset.row); 
+                const c = parseInt(currentCell.dataset.col);
+
                 if (dimension === 'row' && r === gridRows - 1) return true; 
                 if (dimension === 'col' && c === gridCols - 1) return true; 
+                
                 const neighbors = getNeighbors(r, c);
                 neighbors.forEach(neighborId => {
                     if (!visited.has(neighborId)) {
@@ -876,50 +1132,43 @@
                 currentlySelectedCellContent = null;
             }
 
-            winMessageText.innerText = `🎉 ${winnerText} 🎉`;
-            winOverlay.classList.add('visible'); 
+            if(winMessageText) winMessageText.innerText = `🎉 ${winnerText} 🎉`;
+            if(winOverlay) winOverlay.classList.add('visible'); 
             document.querySelectorAll('.grid-cell:not(.answered-team1):not(.answered-team2)')
                 .forEach(cell => { cell.style.opacity = '0.6'; cell.style.cursor = 'not-allowed'; });
-            teamButtonsArea.innerHTML = ''; 
-            teamButtonsArea.style.display = 'none'; 
+            if(teamButtonsArea) {
+                teamButtonsArea.innerHTML = ''; 
+                teamButtonsArea.style.display = 'none'; 
+            }
         }
-
-        document.getElementById('team1Color').addEventListener('input', (e) => {
-            document.documentElement.style.setProperty('--color-team1', e.target.value);
-            document.querySelectorAll('.grid-cell.answered-team1').forEach(cell => {
-                cell.style.backgroundColor = e.target.value; cell.style.borderColor = e.target.value;
-            });
-            updateGridBackground(); 
-        });
-        document.getElementById('team2Color').addEventListener('input', (e) => {
-            document.documentElement.style.setProperty('--color-team2', e.target.value);
-            document.querySelectorAll('.grid-cell.answered-team2').forEach(cell => {
-                cell.style.backgroundColor = e.target.value; cell.style.borderColor = e.target.value;
-            });
-            updateGridBackground(); 
-        });
         
         function updateGridBackground() {
-            document.getElementById('grid-background').style.background = `
-                conic-gradient(from 45deg at 50% 50%, var(--color-team2) 0deg 90deg, var(--color-team1) 90deg 180deg, var(--color-team2) 180deg 270deg, var(--color-team1) 270deg 360deg)
-            `;
+            const gridBg = document.getElementById('grid-background');
+            if(gridBg) {
+                gridBg.style.background = `
+                    conic-gradient(from 45deg at 50% 50%, var(--color-team2) 0deg 90deg, var(--color-team1) 90deg 180deg, var(--color-team2) 180deg 270deg, var(--color-team1) 270deg 360deg)
+                `;
+            }
         }
 
-        restartButton.addEventListener('click', () => {
-            winOverlay.classList.remove('visible'); 
+        if(restartButton) restartButton.addEventListener('click', () => {
+            if(winOverlay) winOverlay.classList.remove('visible'); 
             if (titleAnimationIntervalId) { clearInterval(titleAnimationIntervalId); titleAnimationIntervalId = null; }
+            team1Score = 0;
+            team2Score = 0;
+            updateScoreDisplay();
             initialize(); 
         });
 
-        copyAndNavigateButton.addEventListener('click', () => {
+        if(copyAndNavigateButton) copyAndNavigateButton.addEventListener('click', () => {
             const tempTextArea = document.createElement('textarea');
             tempTextArea.value = copyTextValue;
             document.body.appendChild(tempTextArea);
             tempTextArea.select();
             document.execCommand('copy');
             document.body.removeChild(tempTextArea);
-            copyMessage.classList.add('visible');
-            setTimeout(() => { copyMessage.classList.remove('visible'); }, 2000); 
+            if(copyMessage) copyMessage.classList.add('visible');
+            setTimeout(() => { if(copyMessage) copyMessage.classList.remove('visible'); }, 2000); 
             window.open(questionsWebsiteUrl, "_blank");
         });
     </script>
