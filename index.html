@@ -28,10 +28,10 @@
             --color-border-horizontal: #FB923C;
             --color-cell-bg: #FFFFFF;
             --color-hex-outer-border: #333;
-            --color-cell-text: #000000;
+            --color-cell-text: #000000; /* Original text color for cells */
             --color-team1: var(--color-border-vertical);
             --color-team2: var(--color-border-horizontal);
-            --color-text-light: #FFFFFF;
+            --color-text-light: #FFFFFF; /* Light text color, used for pulsing and answered cells */
             --color-text-dark: #333333;
             --color-win-message-bg: rgba(0, 0, 0, 0.75);
 
@@ -72,20 +72,19 @@
             overflow: hidden; 
         }
 
-        /* --- قسم زر الأسئلة (كان top-action-buttons-container) --- */
-        #action-button-area { /* تم تغيير الاسم ليعكس الغرض العام أكثر */
+        #action-button-area {
             display: flex;
             justify-content: center; 
             position: relative; 
             z-index: 10; 
         }
         .action-button-style {
-            padding: 10px 15px; /* تم تعديل الحشوة قليلاً */
+            padding: 10px 15px; 
             background-color: #4CAF50; color: white; border: none;
             border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             width: auto; 
-            min-width: 130px; /* تم تقليل الحد الأدنى للعرض */
+            min-width: 130px; 
             font-family: 'AA-galaxy', sans-serif;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -94,8 +93,8 @@
             font-size: 0.9rem; color: #4CAF50; opacity: 0; transition: opacity 0.3s ease;
             position: absolute; left: 50%; 
             transform: translateX(-50%); 
-            bottom: 100%; /* تغيير ليظهر فوق الزر */
-            margin-bottom: 8px; /* مسافة بين الرسالة والزر */
+            bottom: 100%; 
+            margin-bottom: 8px; 
             background-color: rgba(0,0,0,0.75);
             padding: 6px 12px; border-radius: 5px; color: white; white-space: nowrap;
             pointer-events: none; font-family: 'AA-galaxy', sans-serif;
@@ -117,7 +116,7 @@
 
         #game-title-and-buttons {
             display: flex; flex-direction: column; align-items: center;
-            gap: 20px; /* زيادة المسافة قليلاً لتعويض إزالة الزر من هنا */
+            gap: 20px; 
             flex-shrink: 0;
         }
 
@@ -141,20 +140,19 @@
         #title-line-3 { font-size: 3.5rem; color: #EF5350; }
 
         .color-controls {
-            /* margin-bottom: 30px; /* تمت الإزالة، ستتم إدارتها بواسطة الحاوية الأم */
-            display: flex; justify-content: center; align-items: center; /* توسيط المحتوى */
-            gap: 10px 20px; /* gap عمودي وأفقي */
+            display: flex; justify-content: center; align-items: center; 
+            gap: 10px 20px; 
             flex-wrap: wrap;
             position: relative; z-index: 2;
         }
-        .color-controls > div { /* لتوسيط كل زوج من label و input */
+        .color-controls > div { 
             display: flex;
-            flex-direction: column; /* label فوق input */
+            flex-direction: column; 
             align-items: center;
             gap: 5px;
         }
         .color-controls label { font-weight: bold; color: var(--color-text-dark); font-family: 'AA-galaxy', sans-serif; }
-        .color-controls input[type="color"] { /* لضمان حجم مناسب لمربع اللون */
+        .color-controls input[type="color"] { 
             width: 50px;
             height: 30px;
             border-radius: 4px;
@@ -188,20 +186,38 @@
             box-sizing: border-box; margin-right: var(--hex-margin-h);
         }
         .grid-cell:last-child { margin-right: 0; }
-        .grid-cell:hover:not(.answered-team1):not(.answered-team2) { transform: scale(1.08); z-index: 5; }
+        .grid-cell:hover:not(.answered-team1):not(.answered-team2) { 
+            transform: scale(1.08); 
+            z-index: 5; 
+        }
         .cell-content {
             font-size: calc(var(--hex-width) * 0.45); max-width: calc(var(--hex-width) * 0.75);
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            font-weight: bold; user-select: none; text-align: center; color: var(--color-cell-text);
+            font-weight: bold; user-select: none; text-align: center; 
+            color: var(--color-cell-text); /* Default text color */
             font-family: 'AA-galaxy' !important;
+            transition: color 0.1s ease-out; 
         }
         .grid-cell.answered-team1, .grid-cell.answered-team2 { cursor: default; }
         .grid-cell.answered-team1:hover, .grid-cell.answered-team2:hover { transform: scale(1); }
         .grid-cell.answered-team1 { background-color: var(--color-team1) !important; border-color: var(--color-team1) !important; }
         .grid-cell.answered-team2 { background-color: var(--color-team2) !important; border-color: var(--color-team2) !important; }
-        .grid-cell.answered-team1 .cell-content, .grid-cell.answered-team2 .cell-content {
-            color: var(--color-text-light) !important; display: none;
+        
+        .grid-cell.answered-team1 .cell-content, 
+        .grid-cell.answered-team2 .cell-content {
+            color: var(--color-text-light) !important; 
+            display: none; 
         }
+
+        @keyframes textColorPulse {
+            0% { color: var(--color-cell-text); } 
+            50% { color: var(--color-text-light); } 
+            100% { color: var(--color-cell-text); } 
+        }
+        .grid-cell .cell-content.selected-text-pulse {
+            animation: textColorPulse 1s infinite; /* Updated duration to 1s */
+        }
+
 
         #team-buttons-area {
             display: flex; flex-direction: column; justify-content: center; gap: 15px;
@@ -275,7 +291,6 @@
         .modal-buttons button.cancel-btn { background-color: #EF4444; color: white; }
         .modal-buttons button.cancel-btn:hover { background-color: #dc2626; transform: translateY(-2px); }
 
-        /* --- أنماط الشبكات الزخرفية --- */
         .decorative-hex-grid {
             position: absolute;
             z-index: 0; 
@@ -325,31 +340,30 @@
             opacity: 0.55; 
         }
 
-        /* --- حاوية جديدة لأدوات التحكم السفلية (زر الأسئلة + ألوان الفرق) --- */
         #page-controls-container {
             display: flex;
-            flex-direction: column; /* افتراضي للشاشات الصغيرة */
+            flex-direction: column; 
             align-items: center;
-            gap: 20px; /* المسافة بين العناصر عند التكديس */
+            gap: 20px; 
             width: 100%;
-            margin-top: 20px; /* مسافة فوق هذه المجموعة */
-            margin-bottom: 30px; /* مسافة أسفل هذه المجموعة */
-            padding: 0 10px; /* حشوة جانبية صغيرة */
+            margin-top: 20px; 
+            margin-bottom: 30px; 
+            padding: 0 10px; 
         }
 
 
         /* --- Responsive --- */
-        @media (min-width: 768px) { /* md breakpoint, أو أي نقطة مناسبة */
+        @media (min-width: 768px) { 
             #page-controls-container {
-                flex-direction: row; /* ترتيب أفقي للشاشات الأكبر */
-                justify-content: center; /* توسيط المجموعة */
-                gap: 30px; /* المسافة بين العناصر في الصف */
+                flex-direction: row; 
+                justify-content: center; 
+                gap: 30px; 
             }
             .color-controls {
-                gap: 20px; /* استعادة الـ gap الأصلي للشاشات الأكبر */
+                gap: 20px; 
             }
              .color-controls > div {
-                flex-direction: row; /* label بجانب input */
+                flex-direction: row; 
                 align-items: center;
              }
         }
@@ -406,7 +420,7 @@
             }
             .cell-content { font-size: calc(var(--hex-width) * 0.5); }
             .game-layout-row { flex-direction: column; align-items: center; gap: 20px; }
-            #game-title-and-buttons { width: 100%; margin-bottom: 20px; gap: 15px; /* ضبط الـ gap هنا أيضاً */ }
+            #game-title-and-buttons { width: 100%; margin-bottom: 20px; gap: 15px; }
             #game-title-text { max-width: 150px; margin: 0 auto; }
             #title-line-1 { font-size: 2rem; } #title-line-2 { font-size: 1.5rem; } #title-line-3 { font-size: 2rem; }
             
@@ -417,14 +431,14 @@
                 flex-direction: column; justify-content: center; 
             }
             .action-button-style { 
-                 width: auto; /* السماح للزر بأخذ عرض المحتوى + الحشوة */
-                 min-width: 120px; /* ضمان حد أدنى للعرض */
-                 padding: 8px 15px; /* تعديل الحشوة لتناسب الشاشات الصغيرة */
+                 width: auto; 
+                 min-width: 120px; 
+                 padding: 8px 15px; 
             } 
             #page-controls-container {
-                 gap: 15px; /* تقليل المسافة بين العناصر المكدسة */
+                 gap: 15px; 
             }
-            .color-controls > div { /* ضمان أن label فوق input على الشاشات الصغيرة جداً */
+            .color-controls > div { 
                 flex-direction: column;
                 align-items: center;
             }
@@ -523,6 +537,7 @@
         const DEFAULT_PLAYER_NAME = "خبزة"; 
         const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; 
         let titleAnimationIntervalId = null; 
+        let currentlySelectedCellContent = null; 
 
         // --- DOM Elements ---
         const loadingDiv = document.getElementById('loading');
@@ -553,6 +568,11 @@
             winOverlay.classList.remove('visible'); 
             nameInputModal.classList.add('hidden'); 
             gameIsOver = false;
+            
+            if (currentlySelectedCellContent) {
+                currentlySelectedCellContent.classList.remove('selected-text-pulse');
+            }
+            currentlySelectedCellContent = null; 
 
             if (gameTitleTextDiv) {
                 gameTitleTextDiv.style.display = 'flex'; 
@@ -690,36 +710,67 @@
                 return;
             }
             const cell = event.currentTarget;
-            currentClickedCellId = cell.id;
+            const cellContent = cell.querySelector('.cell-content');
+            currentClickedCellId = cell.id; 
+
+            if (currentlySelectedCellContent && currentlySelectedCellContent !== cellContent) {
+                currentlySelectedCellContent.classList.remove('selected-text-pulse');
+            }
+
             teamButtonsArea.innerHTML = ''; 
-            teamButtonsArea.style.display = 'flex'; 
+            teamButtonsArea.style.display = 'flex';
 
             if (cell.classList.contains(team1Class) || cell.classList.contains(team2Class)) {
+                if (currentlySelectedCellContent === cellContent) { 
+                    cellContent.classList.remove('selected-text-pulse');
+                }
+                currentlySelectedCellContent = null; 
+
                 const cancelButton = document.createElement('button');
                 cancelButton.className = 'button-cancel';
                 cancelButton.innerText = 'إلغاء الإجابة';
                 cancelButton.onclick = () => cancelAnswer();
                 teamButtonsArea.appendChild(cancelButton);
+
             } else {
-                const btn1 = document.createElement('button');
-                btn1.className = 'button-team1';
-                btn1.innerText = 'الفريق الأول أجاب';
-                btn1.onclick = () => setUserChoice(team1Class);
-                const btn2 = document.createElement('button');
-                btn2.className = 'button-team2';
-                btn2.innerText = 'الفريق الثاني أجاب';
-                btn2.onclick = () => setUserChoice(team2Class);
-                teamButtonsArea.appendChild(btn1);
-                teamButtonsArea.appendChild(btn2);
+                if (currentlySelectedCellContent === cellContent) {
+                    cellContent.classList.remove('selected-text-pulse');
+                    currentlySelectedCellContent = null;
+                    teamButtonsArea.innerHTML = ''; 
+                    teamButtonsArea.style.display = 'none';
+                    currentClickedCellId = null; 
+                    return; 
+                } else {
+                    if (cellContent) cellContent.classList.add('selected-text-pulse'); 
+                    currentlySelectedCellContent = cellContent;
+
+                    const btn1 = document.createElement('button');
+                    btn1.className = 'button-team1';
+                    btn1.innerText = 'الفريق الأول أجاب';
+                    btn1.onclick = () => setUserChoice(team1Class);
+                    const btn2 = document.createElement('button');
+                    btn2.className = 'button-team2';
+                    btn2.innerText = 'الفريق الثاني أجاب';
+                    btn2.onclick = () => setUserChoice(team2Class);
+                    teamButtonsArea.appendChild(btn1);
+                    teamButtonsArea.appendChild(btn2);
+                }
             }
         }
 
         function setUserChoice(chosenTeamClass) {
             if (!currentClickedCellId || gameIsOver) return;
             const targetCell = document.getElementById(currentClickedCellId);
+            const targetCellContent = targetCell ? targetCell.querySelector('.cell-content') : null;
+
+            if (targetCellContent && currentlySelectedCellContent === targetCellContent) {
+                targetCellContent.classList.remove('selected-text-pulse');
+                currentlySelectedCellContent = null; 
+            }
+
             if (targetCell && !targetCell.classList.contains(team1Class) && !targetCell.classList.contains(team2Class)) {
                 targetCell.classList.add(chosenTeamClass);
-                targetCell.querySelector('.cell-content').style.display = 'none'; 
+                if (targetCellContent) targetCellContent.style.display = 'none'; 
                 checkWinCondition();
                 teamButtonsArea.innerHTML = ''; 
                 teamButtonsArea.style.display = 'none'; 
@@ -730,9 +781,16 @@
         function cancelAnswer() {
             if (!currentClickedCellId || gameIsOver) return;
             const targetCell = document.getElementById(currentClickedCellId);
+            const targetCellContent = targetCell ? targetCell.querySelector('.cell-content') : null;
+
+            if (targetCellContent && currentlySelectedCellContent === targetCellContent) {
+                targetCellContent.classList.remove('selected-text-pulse');
+                currentlySelectedCellContent = null;
+            }
+            
             if (targetCell && (targetCell.classList.contains(team1Class) || targetCell.classList.contains(team2Class))) {
                 targetCell.classList.remove(team1Class, team2Class);
-                targetCell.querySelector('.cell-content').style.display = 'block'; 
+                if (targetCellContent) targetCellContent.style.display = 'block'; 
                 teamButtonsArea.innerHTML = ''; 
                 teamButtonsArea.style.display = 'none'; 
             }
@@ -812,6 +870,12 @@
         function announceWinner(winnerText, winnerClass) {
             if (gameIsOver) return;
             gameIsOver = true;
+
+            if (currentlySelectedCellContent) { 
+                currentlySelectedCellContent.classList.remove('selected-text-pulse');
+                currentlySelectedCellContent = null;
+            }
+
             winMessageText.innerText = `🎉 ${winnerText} 🎉`;
             winOverlay.classList.add('visible'); 
             document.querySelectorAll('.grid-cell:not(.answered-team1):not(.answered-team2)')
