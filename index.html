@@ -103,9 +103,9 @@
             display: flex; 
             flex-direction: row;
             align-items: center;
-            justify-content: space-around; /* Changed to space-around for better mobile spacing */
+            justify-content: space-around; 
             width: 100%;
-            max-width: 400px; /* Slightly increased max-width for mobile */
+            max-width: 400px; 
             margin: 0 auto 15px auto; 
         }
 
@@ -139,7 +139,7 @@
         #game-title-text-wrapper { 
             text-align: center;
             margin: 0 5px; 
-            flex-shrink: 0; /* Prevent title from shrinking too much */
+            flex-shrink: 0; 
         }
         #game-title-text {
             display: flex; flex-direction: column; align-items: center;
@@ -416,21 +416,22 @@
         @media (min-width: 768px) { 
             .game-layout-row {
                 flex-direction: row; 
-                align-items: flex-start; 
+                align-items: center; /* Align items vertically in the center of the row */
                 justify-content: center; 
-                gap: 30px; 
+                gap: 10px; /* Further reduced gap */
             }
             #info-panel {
                 order: 1; 
                 flex-shrink: 0; 
                 width: auto; 
+                max-width: 280px; /* Slightly reduced max-width for info panel */
                 margin-bottom: 0; 
-                align-items: center; /* Center items in info-panel */
+                align-items: center; 
+                align-self: center; /* Ensure it aligns with grid-layout if heights differ */
             }
             #grid-layout-container {
                 order: 2; 
-                margin-left: auto; /* Push grid to the right if info-panel is smaller */
-                margin-right: auto; /* Center grid if info-panel is larger or equal */
+                align-self: center; /* Ensure it aligns with info-panel if heights differ */
             }
             #header-content-wrapper { 
                 display: grid; 
@@ -440,7 +441,7 @@
                 grid-template-columns: auto auto; 
                 gap: 10px 15px; 
                 justify-items: center; 
-                width: auto; 
+                width: 100%; 
                 max-width: none; 
                 margin-bottom: 15px; 
             }
@@ -482,7 +483,7 @@
                 --grid-size-hex-width: 55px;
                 --grid-size-option-hex-width: 38px;
             }
-            #header-content-wrapper { justify-content: space-around; } /* Ensure space around for mobile */
+            #header-content-wrapper { justify-content: space-around; } 
             #game-title-text-wrapper { flex-grow: 1; text-align: center; }
             #game-title-text { max-width: 180px; margin: 0 auto; } 
             #title-line-1 { font-size: 2.5rem; } #title-line-2 { font-size: 1.7rem; } #title-line-3 { font-size: 2.5rem; }
@@ -508,7 +509,7 @@
                 --grid-size-hex-width: 50px;
                 --grid-size-option-hex-width: 35px;
             }
-            #header-content-wrapper { max-width: 320px; justify-content: space-between; } /* space-between for smallest */
+            #header-content-wrapper { max-width: 320px; justify-content: space-between; } 
             .cell-content { font-size: calc(var(--hex-width) * 0.5); }
             #game-title-text { max-width: 130px; }
             #title-line-1 { font-size: 2rem; } #title-line-2 { font-size: 1.4rem; } #title-line-3 { font-size: 2rem; }
@@ -672,7 +673,7 @@
             if(nameInputModal) nameInputModal.classList.add('hidden'); 
             gameIsOver = false;
             
-            updateScoreDisplay(); // Update score display at initialization
+            updateScoreDisplay(); 
             
             const rootStyles = getComputedStyle(document.documentElement);
             const initialTeam1Color = rootStyles.getPropertyValue('--color-team1').trim();
@@ -726,20 +727,18 @@
                 optionBtn.textContent = i;
                 if (i === currentGridSize) {
                     optionBtn.classList.add('selected');
-                     // Apply team 1 color to the selected button initially
                     optionBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.color = 'var(--color-text-light)';
                 }
                 optionBtn.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent click from bubbling to document and closing immediately
+                    event.stopPropagation(); 
                     currentGridSize = i;
                     if(gridSizeButton) gridSizeButton.textContent = currentGridSize;
                     
-                    // Update selected class
                     gridSizeOptionsContainer.querySelectorAll('.grid-size-option-btn').forEach(btn => {
                         btn.classList.remove('selected');
-                        btn.style.backgroundColor = ''; // Reset non-selected to default
+                        btn.style.backgroundColor = ''; 
                         btn.style.borderColor = '';
                         btn.style.color = '';
                     });
