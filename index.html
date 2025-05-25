@@ -636,8 +636,8 @@
         const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; 
         let titleAnimationIntervalId = null; 
         let currentlySelectedCellContent = null; 
-        let team1Score = 0; 
-        let team2Score = 0; 
+        let team1Score = 0; // Global score for Team 1, reset only on page load
+        let team2Score = 0; // Global score for Team 2, reset only on page load
 
         // --- DOM Elements ---
         const loadingDiv = document.getElementById('loading');
@@ -692,6 +692,9 @@
             if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
             gameIsOver = false;
             
+            // Scores (team1Score, team2Score) are global and persist through initialize calls
+            // unless explicitly reset by page load.
+            // updateScoreDisplay will show the current accumulated scores.
             updateScoreDisplay(); 
             
             const rootStyles = getComputedStyle(document.documentElement);
@@ -767,10 +770,7 @@
                     
                     if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
                     
-                    team1Score = 0;
-                    team2Score = 0;
-                    updateScoreDisplay();
-                    
+                    // Scores are NOT reset here, they persist
                     initialize(); 
                 });
                 if(currentRow) currentRow.appendChild(optionBtn); // Append button to the current row
@@ -792,8 +792,10 @@
         }
         
         function updateScoreDisplay() {
-            if (team1ScoreDisplay) team1ScoreDisplay.innerText = team1Score;
-            if (team2ScoreDisplay) team2ScoreDisplay.innerText = team2Score;
+            // This function updates the score numbers in the team hexagons.
+            // It uses the global team1Score and team2Score variables.
+            if (team1ScoreDisplay) team1ScoreDisplay.innerText = String(team1Score);
+            if (team2ScoreDisplay) team2ScoreDisplay.innerText = String(team2Score);
         }
 
         function setupColorPickers() {
@@ -813,8 +815,8 @@
                 
                 const selectedModalOption = gridSizeOptionsModalContent ? gridSizeOptionsModalContent.querySelector('.modal-grid-size-option-btn.selected') : null;
                 if(selectedModalOption){
-                     selectedModalOption.style.backgroundColor = newColor; 
-                     selectedModalOption.style.borderColor = newColor;
+                         selectedModalOption.style.backgroundColor = newColor; 
+                         selectedModalOption.style.borderColor = newColor;
                 }
                 if(confirmNameBtn) confirmNameBtn.style.backgroundColor = newColor;
             });
@@ -1083,14 +1085,15 @@
         }
 
         function checkWinCondition() {
+            // This function checks for a win, increments the score, updates the display, and announces the winner.
             if (checkForPath(team1Class, 'row')) { 
-                team1Score++;
-                updateScoreDisplay();
+                team1Score++; // Score for Team 1 is incremented
+                updateScoreDisplay(); // Display is updated with the new score
                 announceWinner("الفريق الأول فاز!", team1Class); return;
             }
             if (checkForPath(team2Class, 'col')) { 
-                team2Score++;
-                updateScoreDisplay();
+                team2Score++; // Score for Team 2 is incremented
+                updateScoreDisplay(); // Display is updated with the new score
                 announceWinner("الفريق الثاني فاز!", team2Class); return;
             }
         }
@@ -1169,9 +1172,7 @@
         if(restartButton) restartButton.addEventListener('click', () => {
             if(winOverlay) winOverlay.classList.remove('visible'); 
             if (titleAnimationIntervalId) { clearInterval(titleAnimationIntervalId); titleAnimationIntervalId = null; }
-            team1Score = 0;
-            team2Score = 0;
-            updateScoreDisplay();
+            // Scores are NOT reset here, they persist through restart
             initialize(); 
         });
 
@@ -1189,4 +1190,3 @@
     </script>
 </body>
 </html>
-
