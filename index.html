@@ -705,7 +705,6 @@
                 </div>
             </div>
             <div class="modal-buttons">
-                <!-- The confirm-btn class will make it adopt team1's color by default, or be overridden by JS -->
                 <button id="closeColorPickerBtn" class="confirm-btn">إغلاق</button> 
             </div>
         </div>
@@ -730,6 +729,8 @@
         const questionsWebsiteUrl = "https://sahamstudio.com/horoof/questions.php"; 
         const DEFAULT_PLAYER_NAME = "خبزة"; 
         const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; 
+        const TEAM1_COLOR_STORAGE_KEY = "honeycombTeam1Color"; // localStorage key for team 1 color
+        const TEAM2_COLOR_STORAGE_KEY = "honeycombTeam2Color"; // localStorage key for team 2 color
         let titleAnimationIntervalId = null; 
         let currentlySelectedCellContent = null; 
         let team1Score = 0; 
@@ -801,18 +802,16 @@
             
             updateScoreDisplay(); 
             
-            // Retrieve initial colors from CSS variables if not already set in inputs
-            // or ensure inputs reflect the CSS variables.
             const rootStyles = getComputedStyle(document.documentElement);
-            let initialTeam1Color = team1ColorHexInput.value || rootStyles.getPropertyValue('--color-team1').trim();
-            let initialTeam2Color = team2ColorHexInput.value || rootStyles.getPropertyValue('--color-team2').trim();
+            // Load colors from localStorage or use defaults
+            let initialTeam1Color = localStorage.getItem(TEAM1_COLOR_STORAGE_KEY) || rootStyles.getPropertyValue('--color-border-vertical').trim();
+            let initialTeam2Color = localStorage.getItem(TEAM2_COLOR_STORAGE_KEY) || rootStyles.getPropertyValue('--color-border-horizontal').trim();
             
             team1ColorHexInput.value = initialTeam1Color;
             team2ColorHexInput.value = initialTeam2Color;
 
-            // Apply initial colors to all relevant elements
-            applyTeamColorChange(1, initialTeam1Color, true); // true for initial setup
-            applyTeamColorChange(2, initialTeam2Color, true); // true for initial setup
+            applyTeamColorChange(1, initialTeam1Color, true); 
+            applyTeamColorChange(2, initialTeam2Color, true); 
 
 
             if (currentlySelectedCellContent) {
@@ -830,7 +829,6 @@
                 span.addEventListener('dblclick', handleNameChangeDblClick);
             });
 
-            // updateGridBackground(); // Called within applyTeamColorChange
             populateGrid(); 
             
             if (decorativeGridTL) {
@@ -867,7 +865,6 @@
                 optionBtn.textContent = i;
                 if (i === currentGridSize) {
                     optionBtn.classList.add('selected');
-                    // Apply team1 color to selected grid size option
                     optionBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.color = 'var(--color-text-light)';
@@ -944,7 +941,7 @@
 
             colorPickerTitle.textContent = `اختر لون الفريق ${teamNumber}`;
 
-            predefinedSwatchesArea.innerHTML = ''; // Clear previous swatches
+            predefinedSwatchesArea.innerHTML = ''; 
             
             const predefinedRow1 = document.createElement('div');
             predefinedRow1.classList.add('predefined-color-flex-row');
@@ -956,11 +953,11 @@
                 swatch.classList.add('predefined-color-swatch');
                 swatch.style.backgroundColor = color;
                 swatch.dataset.color = color;
-                swatch.title = color; // Show hex on hover
+                swatch.title = color; 
                 swatch.addEventListener('click', () => {
                     applyTeamColorChange(teamNumber, color);
                     customColorPreview.style.backgroundColor = color;
-                    currentInput.value = color; // Sync hidden input
+                    currentInput.value = color; 
                 });
                 if (index < 4) {
                     predefinedRow1.appendChild(swatch);
@@ -972,7 +969,7 @@
             predefinedSwatchesArea.appendChild(predefinedRow2);
             
             customColorPreview.style.backgroundColor = currentColor;
-            customColorPreview.onclick = () => { // Ensure this is set fresh
+            customColorPreview.onclick = () => { 
                 if (currentEditingTeamForColor === 1) team1ColorHexInput.click();
                 else if (currentEditingTeamForColor === 2) team2ColorHexInput.click();
             };
@@ -990,48 +987,36 @@
             const inputElement = (teamNumber === 1) ? team1ColorHexInput : team2ColorHexInput;
             const answeredCellClass = (teamNumber === 1) ? team1Class : team2Class;
             const teamButtonSelector = `.button-team${teamNumber}`;
+            const storageKey = (teamNumber === 1) ? TEAM1_COLOR_STORAGE_KEY : TEAM2_COLOR_STORAGE_KEY;
 
-            // 1. Update CSS Variable
             document.documentElement.style.setProperty(teamVar, newColor);
-
-            // 2. Update Score Hex Background
             if (scoreHexEl) scoreHexEl.style.backgroundColor = newColor;
-
-            // 3. Update Hidden Input Value
             if (inputElement && inputElement.value !== newColor) {
                  inputElement.value = newColor;
             }
-
-            // 4. Update Answered Cells
             document.querySelectorAll(`.grid-cell.${answeredCellClass}`).forEach(cell => {
                 cell.style.backgroundColor = newColor;
                 cell.style.borderColor = newColor;
             });
-
-            // 5. Update Team Button in Team Buttons Area (if visible)
             const teamButton = teamButtonsArea ? teamButtonsArea.querySelector(teamButtonSelector) : null;
             if (teamButton) teamButton.style.backgroundColor = newColor;
-
-            // 6. Update Grid Background
             updateGridBackground();
-
-            // 7. Update selected modal option for grid size (if it uses team1 color)
             const selectedGridSizeOption = gridSizeOptionsModalContent ? gridSizeOptionsModalContent.querySelector('.modal-grid-size-option-btn.selected') : null;
             if (selectedGridSizeOption && teamNumber === 1) { 
                 selectedGridSizeOption.style.backgroundColor = newColor;
                 selectedGridSizeOption.style.borderColor = newColor;
             }
-
-            // 8. Update Confirm Name Button (if it uses team1 color)
             if (confirmNameBtn && teamNumber === 1) { 
                  confirmNameBtn.style.backgroundColor = newColor;
             }
-            
-            // 9. Update the Color Picker Modal's "Close" button color if it's visible and for the current team
             if (!isInitialSetup && colorPickerModal && colorPickerModal.classList.contains('visible') && currentEditingTeamForColor === teamNumber) {
                 if (closeColorPickerBtn) {
                     closeColorPickerBtn.style.backgroundColor = newColor;
                 }
+            }
+            // Save to localStorage if not initial setup
+            if (!isInitialSetup) {
+                localStorage.setItem(storageKey, newColor);
             }
         }
 
@@ -1363,7 +1348,6 @@
         function updateGridBackground() {
             const gridBg = document.getElementById('grid-background');
             if(gridBg) {
-                // Ensure CSS variables are correctly fetched for the gradient
                 const colorTeam1 = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                 const colorTeam2 = getComputedStyle(document.documentElement).getPropertyValue('--color-team2').trim();
                 gridBg.style.background = `
@@ -1389,7 +1373,6 @@
                  setTimeout(() => { if(copyMessage) copyMessage.classList.remove('visible'); }, 2000); 
             } catch (err) {
                 console.error('Failed to copy text: ', err);
-                // Optionally, inform the user that copy failed
             }
             document.body.removeChild(tempTextArea);
             window.open(questionsWebsiteUrl, "_blank");
