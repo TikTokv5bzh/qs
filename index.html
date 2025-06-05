@@ -38,6 +38,8 @@
             --color-grid-size-button-text: #333333;
             --color-grid-size-option-bg: #e9e9e9;
             --color-grid-size-option-hover-bg: #dcdcdc;
+            --color-modal-close-button-bg: #6B7280; /* Neutral color for close button */
+            --color-modal-close-button-hover-bg: #4B5563;
 
 
             /* --- الأبعاد الأساسية للشكل السداسي --- */
@@ -46,9 +48,9 @@
             --hex-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
             /* --- تعديلات التداخل لخلايا النحل المتلاصقة --- */
-            --hex-margin-h: calc(var(--hex-width) * -0.134); /* Adjusted for tighter packing */
-            --hex-margin-v-overlap: calc(var(--hex-height) * -0.25); /* Adjusted for tighter packing */
-            --hex-stagger-offset: calc(var(--hex-width) * (1 - 0.134*2) / 2); /* Adjusted for tighter packing */
+            --hex-margin-h: calc(var(--hex-width) * -0.134); 
+            --hex-margin-v-overlap: calc(var(--hex-height) * -0.25); 
+            --hex-stagger-offset: calc(var(--hex-width) * (1 - 0.134*2) / 2); 
 
 
             --container-padding: 20px; 
@@ -137,7 +139,7 @@
         .score-hex:hover {
             transform: scale(1.1);
         }
-        .hidden-color-input {
+        .hidden-color-input { /* Keep this for the native picker, even if triggered differently */
             position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; top:0; left:0;
         }
 
@@ -325,11 +327,18 @@
 
         .modal-content {
             background-color: #FFFFFF; padding: 25px; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); text-align: center; max-width: 280px; /* Adjusted for 3 columns of smaller hexes */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); text-align: center; 
             width: 90%; transform: translateY(-20px) scale(0.95); opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
             font-family: 'AA-galaxy', sans-serif;
         }
+        #name-input-modal .modal-content, #grid-size-modal .modal-content {
+             max-width: 280px;
+        }
+        #color-picker-modal .modal-content {
+            max-width: 380px; /* Adjusted for color picker layout */
+        }
+
         .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); opacity: 1;}
 
         .modal-content h3 { font-size: 1.8rem; color: var(--color-text-dark); margin-bottom: 20px; font-weight: bold; }
@@ -402,6 +411,71 @@
         .modal-buttons button.confirm-btn:hover { background-color: #28a77a; transform: translateY(-2px); }
         .modal-buttons button.cancel-btn { background-color: #EF4444; color: white; }
         .modal-buttons button.cancel-btn:hover { background-color: #dc2626; transform: translateY(-2px); }
+        .modal-buttons button.neutral-close-btn {
+            background-color: var(--color-modal-close-button-bg);
+            color: white;
+        }
+        .modal-buttons button.neutral-close-btn:hover {
+            background-color: var(--color-modal-close-button-hover-bg);
+            transform: translateY(-2px);
+        }
+
+
+        /* Color Picker Modal Styles */
+        #color-picker-swatches-container {
+            display: flex;
+            justify-content: space-evenly; /* Distribute space for predefined and custom */
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow custom area to wrap below on small screens */
+        }
+        #predefined-color-swatches-area { /* Container for the two rows of predefined swatches */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center the rows */
+            gap: 8px; /* Gap between the two rows */
+        }
+        .predefined-color-flex-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px; /* Gap between swatches in a row */
+        }
+        .predefined-color-swatch {
+            width: 35px; /* Slightly larger for easier clicking */
+            height: 35px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid #eee;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .predefined-color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #ccc;
+        }
+        #custom-color-swatch-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        #custom-color-preview {
+            width: 60px; /* Larger swatch */
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid #ccc;
+            transition: border-color 0.2s ease;
+            background-clip: padding-box; /* Ensures background doesn't go under border */
+        }
+        #custom-color-preview:hover {
+            border-color: #999;
+        }
+        #custom-color-swatch-area small {
+            font-size: 0.8rem;
+            color: var(--color-text-dark);
+        }
+
 
         .decorative-hex-grid { position: absolute; z-index: 0; pointer-events: none; }
         .decorative-hex-grid .hex-row { display: flex; margin-bottom: calc(var(--hex-height-decorative) * -0.2); }
@@ -471,7 +545,6 @@
             #title-line-3 { font-size: 3.2rem; }
             .win-message-text { font-size: 4rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
-            .modal-content { max-width: 280px; } /* Adjust modal width for desktop */
         }
         
         @media (max-width: 900px) and (min-width: 768px) { 
@@ -505,7 +578,7 @@
             #decorative-grid-bottom-right { bottom: -50px; right: -50px; }
             .win-message-text { font-size: 2.8rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.38); }
-            .modal-content { max-width: 260px; padding: 20px } 
+            #color-picker-modal .modal-content { max-width: 320px; }
         }
         @media (max-width: 550px) { 
             body { display: block; padding-top: 15px; } 
@@ -527,7 +600,10 @@
             #decorative-grid-bottom-right { bottom: -30px; right: -30px; transform: rotate(15deg); opacity: 0.45; }
             .win-message-text { font-size: 2.2rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
-            .modal-content { max-width: 230px; padding: 15px; }
+            #color-picker-modal .modal-content { max-width: 90%; } /* Make it more responsive for very small screens */
+            .predefined-color-swatch { width: 30px; height: 30px; }
+            #custom-color-preview { width: 50px; height: 50px; }
+
         }
     </style>
 </head>
@@ -615,12 +691,32 @@
         </div>
     </div>
 
+    <!-- New Color Picker Modal -->
+    <div id="color-picker-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="color-picker-title">اختر لون الفريق</h3>
+            <div id="color-picker-swatches-container">
+                <div id="predefined-color-swatches-area">
+                    <!-- Predefined swatches will be dynamically added here by JS -->
+                </div>
+                <div id="custom-color-swatch-area">
+                    <div id="custom-color-preview" title="اختيار لون مخصص"></div>
+                    <small>لون مخصص</small>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <!-- The confirm-btn class will make it adopt team1's color by default, or be overridden by JS -->
+                <button id="closeColorPickerBtn" class="confirm-btn">إغلاق</button> 
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- Configuration ---
         const MIN_GRID_SIZE = 3;
-        const MAX_GRID_SIZE = 9; // Max grid size is now 9
-        let currentGridSize = 6; // Default grid size
+        const MAX_GRID_SIZE = 9; 
+        let currentGridSize = 6; 
         let gridRows = currentGridSize; 
         let gridCols = currentGridSize; 
 
@@ -636,8 +732,11 @@
         const PLAYER_NAME_STORAGE_KEY = "honeycombPlayerName"; 
         let titleAnimationIntervalId = null; 
         let currentlySelectedCellContent = null; 
-        let team1Score = 0; // Global score for Team 1, reset only on page load
-        let team2Score = 0; // Global score for Team 2, reset only on page load
+        let team1Score = 0; 
+        let team2Score = 0; 
+
+        const PREDEFINED_COLORS = ['#EF5350', '#FBC02D', '#66BB6A', '#4FC3F7', '#AB47BC', '#FF7043', '#78909C']; // 7 predefined colors
+        let currentEditingTeamForColor = null; // 1 or 2
 
         // --- DOM Elements ---
         const loadingDiv = document.getElementById('loading');
@@ -670,6 +769,13 @@
         const team1ColorHexInput = document.getElementById('team1ColorHexInput');
         const team2ColorHexInput = document.getElementById('team2ColorHexInput');
 
+        // Color Picker Modal Elements
+        const colorPickerModal = document.getElementById('color-picker-modal');
+        const colorPickerTitle = document.getElementById('color-picker-title');
+        const predefinedSwatchesArea = document.getElementById('predefined-color-swatches-area');
+        const customColorPreview = document.getElementById('custom-color-preview');
+        const closeColorPickerBtn = document.getElementById('closeColorPickerBtn');
+
 
         window.addEventListener('load', initialize);
 
@@ -690,21 +796,23 @@
             if(winOverlay) winOverlay.classList.remove('visible'); 
             if(nameInputModal) nameInputModal.classList.remove('visible'); 
             if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
+            if(colorPickerModal) colorPickerModal.classList.remove('visible');
             gameIsOver = false;
             
-            // Scores (team1Score, team2Score) are global and persist through initialize calls
-            // unless explicitly reset by page load.
-            // updateScoreDisplay will show the current accumulated scores.
             updateScoreDisplay(); 
             
+            // Retrieve initial colors from CSS variables if not already set in inputs
+            // or ensure inputs reflect the CSS variables.
             const rootStyles = getComputedStyle(document.documentElement);
-            const initialTeam1Color = rootStyles.getPropertyValue('--color-team1').trim();
-            const initialTeam2Color = rootStyles.getPropertyValue('--color-team2').trim();
+            let initialTeam1Color = team1ColorHexInput.value || rootStyles.getPropertyValue('--color-team1').trim();
+            let initialTeam2Color = team2ColorHexInput.value || rootStyles.getPropertyValue('--color-team2').trim();
+            
+            team1ColorHexInput.value = initialTeam1Color;
+            team2ColorHexInput.value = initialTeam2Color;
 
-            if(team1ColorHexInput) team1ColorHexInput.value = initialTeam1Color;
-            if(team2ColorHexInput) team2ColorHexInput.value = initialTeam2Color;
-            if(team1ScoreHex) team1ScoreHex.style.backgroundColor = initialTeam1Color;
-            if(team2ScoreHex) team2ScoreHex.style.backgroundColor = initialTeam2Color;
+            // Apply initial colors to all relevant elements
+            applyTeamColorChange(1, initialTeam1Color, true); // true for initial setup
+            applyTeamColorChange(2, initialTeam2Color, true); // true for initial setup
 
 
             if (currentlySelectedCellContent) {
@@ -722,7 +830,7 @@
                 span.addEventListener('dblclick', handleNameChangeDblClick);
             });
 
-            updateGridBackground();
+            // updateGridBackground(); // Called within applyTeamColorChange
             populateGrid(); 
             
             if (decorativeGridTL) {
@@ -745,10 +853,9 @@
             gridSizeOptionsModalContent.innerHTML = ''; 
             
             let currentRow = null;
-            const itemsPerRow = 3; // Controls how many hexes per "conceptual" row in the modal
+            const itemsPerRow = 3; 
 
             for (let i = MIN_GRID_SIZE; i <= MAX_GRID_SIZE; i++) {
-                // Create a new row div if it's the start of a new row
                 if ((i - MIN_GRID_SIZE) % itemsPerRow === 0) {
                     currentRow = document.createElement('div');
                     currentRow.classList.add('modal-hex-option-row');
@@ -760,6 +867,7 @@
                 optionBtn.textContent = i;
                 if (i === currentGridSize) {
                     optionBtn.classList.add('selected');
+                    // Apply team1 color to selected grid size option
                     optionBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
                     optionBtn.style.color = 'var(--color-text-light)';
@@ -770,10 +878,9 @@
                     
                     if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
                     
-                    // Scores are NOT reset here, they persist
                     initialize(); 
                 });
-                if(currentRow) currentRow.appendChild(optionBtn); // Append button to the current row
+                if(currentRow) currentRow.appendChild(optionBtn); 
             }
         }
 
@@ -792,46 +899,140 @@
         }
         
         function updateScoreDisplay() {
-            // This function updates the score numbers in the team hexagons.
-            // It uses the global team1Score and team2Score variables.
             if (team1ScoreDisplay) team1ScoreDisplay.innerText = String(team1Score);
             if (team2ScoreDisplay) team2ScoreDisplay.innerText = String(team2Score);
         }
 
         function setupColorPickers() {
-            if(team1ScoreHex && team1ColorHexInput) team1ScoreHex.addEventListener('click', () => team1ColorHexInput.click());
-            if(team2ScoreHex && team2ColorHexInput) team2ScoreHex.addEventListener('click', () => team2ColorHexInput.click());
+            if (team1ScoreHex) team1ScoreHex.addEventListener('click', () => openColorPickerModal(1));
+            if (team2ScoreHex) team2ScoreHex.addEventListener('click', () => openColorPickerModal(2));
 
-            if(team1ColorHexInput) team1ColorHexInput.addEventListener('input', (e) => {
-                const newColor = e.target.value;
-                document.documentElement.style.setProperty('--color-team1', newColor);
-                if(team1ScoreHex) team1ScoreHex.style.backgroundColor = newColor; 
-                document.querySelectorAll('.grid-cell.answered-team1').forEach(cell => {
-                    cell.style.backgroundColor = newColor; cell.style.borderColor = newColor;
-                });
-                const team1Button = teamButtonsArea ? teamButtonsArea.querySelector('.button-team1') : null;
-                if (team1Button) team1Button.style.backgroundColor = newColor;
-                updateGridBackground(); 
-                
-                const selectedModalOption = gridSizeOptionsModalContent ? gridSizeOptionsModalContent.querySelector('.modal-grid-size-option-btn.selected') : null;
-                if(selectedModalOption){
-                         selectedModalOption.style.backgroundColor = newColor; 
-                         selectedModalOption.style.borderColor = newColor;
+            if (team1ColorHexInput) team1ColorHexInput.addEventListener('input', (e) => {
+                if (currentEditingTeamForColor === 1) {
+                    const newColor = e.target.value;
+                    applyTeamColorChange(1, newColor);
+                    if (customColorPreview) customColorPreview.style.backgroundColor = newColor;
                 }
-                if(confirmNameBtn) confirmNameBtn.style.backgroundColor = newColor;
             });
 
-            if(team2ColorHexInput) team2ColorHexInput.addEventListener('input', (e) => {
-                const newColor = e.target.value;
-                document.documentElement.style.setProperty('--color-team2', newColor);
-                if(team2ScoreHex) team2ScoreHex.style.backgroundColor = newColor; 
-                document.querySelectorAll('.grid-cell.answered-team2').forEach(cell => {
-                    cell.style.backgroundColor = newColor; cell.style.borderColor = newColor;
-                });
-                const team2Button = teamButtonsArea ? teamButtonsArea.querySelector('.button-team2') : null;
-                if (team2Button) team2Button.style.backgroundColor = newColor;
-                updateGridBackground(); 
+            if (team2ColorHexInput) team2ColorHexInput.addEventListener('input', (e) => {
+                if (currentEditingTeamForColor === 2) {
+                    const newColor = e.target.value;
+                    applyTeamColorChange(2, newColor);
+                    if (customColorPreview) customColorPreview.style.backgroundColor = newColor;
+                }
             });
+
+            if(closeColorPickerBtn && colorPickerModal) {
+                closeColorPickerBtn.addEventListener('click', () => {
+                    colorPickerModal.classList.remove('visible');
+                    currentEditingTeamForColor = null;
+                });
+            }
+        }
+
+        function openColorPickerModal(teamNumber) {
+            if (!colorPickerModal || !predefinedSwatchesArea || !customColorPreview || !team1ColorHexInput || !team2ColorHexInput || !colorPickerTitle) {
+                console.error("Color picker modal elements not found");
+                return;
+            }
+
+            currentEditingTeamForColor = teamNumber;
+            const currentInput = (teamNumber === 1) ? team1ColorHexInput : team2ColorHexInput;
+            const currentColor = currentInput.value;
+            const teamColorVar = teamNumber === 1 ? '--color-team1' : '--color-team2';
+
+            colorPickerTitle.textContent = `اختر لون الفريق ${teamNumber}`;
+
+            predefinedSwatchesArea.innerHTML = ''; // Clear previous swatches
+            
+            const predefinedRow1 = document.createElement('div');
+            predefinedRow1.classList.add('predefined-color-flex-row');
+            const predefinedRow2 = document.createElement('div');
+            predefinedRow2.classList.add('predefined-color-flex-row');
+
+            PREDEFINED_COLORS.forEach((color, index) => {
+                const swatch = document.createElement('div');
+                swatch.classList.add('predefined-color-swatch');
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+                swatch.title = color; // Show hex on hover
+                swatch.addEventListener('click', () => {
+                    applyTeamColorChange(teamNumber, color);
+                    customColorPreview.style.backgroundColor = color;
+                    currentInput.value = color; // Sync hidden input
+                });
+                if (index < 4) {
+                    predefinedRow1.appendChild(swatch);
+                } else {
+                    predefinedRow2.appendChild(swatch);
+                }
+            });
+            predefinedSwatchesArea.appendChild(predefinedRow1);
+            predefinedSwatchesArea.appendChild(predefinedRow2);
+            
+            customColorPreview.style.backgroundColor = currentColor;
+            customColorPreview.onclick = () => { // Ensure this is set fresh
+                if (currentEditingTeamForColor === 1) team1ColorHexInput.click();
+                else if (currentEditingTeamForColor === 2) team2ColorHexInput.click();
+            };
+            
+            if (closeColorPickerBtn) {
+                 closeColorPickerBtn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue(teamColorVar).trim();
+            }
+
+            colorPickerModal.classList.add('visible');
+        }
+
+        function applyTeamColorChange(teamNumber, newColor, isInitialSetup = false) {
+            const teamVar = `--color-team${teamNumber}`;
+            const scoreHexEl = (teamNumber === 1) ? team1ScoreHex : team2ScoreHex;
+            const inputElement = (teamNumber === 1) ? team1ColorHexInput : team2ColorHexInput;
+            const answeredCellClass = (teamNumber === 1) ? team1Class : team2Class;
+            const teamButtonSelector = `.button-team${teamNumber}`;
+
+            // 1. Update CSS Variable
+            document.documentElement.style.setProperty(teamVar, newColor);
+
+            // 2. Update Score Hex Background
+            if (scoreHexEl) scoreHexEl.style.backgroundColor = newColor;
+
+            // 3. Update Hidden Input Value
+            if (inputElement && inputElement.value !== newColor) {
+                 inputElement.value = newColor;
+            }
+
+            // 4. Update Answered Cells
+            document.querySelectorAll(`.grid-cell.${answeredCellClass}`).forEach(cell => {
+                cell.style.backgroundColor = newColor;
+                cell.style.borderColor = newColor;
+            });
+
+            // 5. Update Team Button in Team Buttons Area (if visible)
+            const teamButton = teamButtonsArea ? teamButtonsArea.querySelector(teamButtonSelector) : null;
+            if (teamButton) teamButton.style.backgroundColor = newColor;
+
+            // 6. Update Grid Background
+            updateGridBackground();
+
+            // 7. Update selected modal option for grid size (if it uses team1 color)
+            const selectedGridSizeOption = gridSizeOptionsModalContent ? gridSizeOptionsModalContent.querySelector('.modal-grid-size-option-btn.selected') : null;
+            if (selectedGridSizeOption && teamNumber === 1) { 
+                selectedGridSizeOption.style.backgroundColor = newColor;
+                selectedGridSizeOption.style.borderColor = newColor;
+            }
+
+            // 8. Update Confirm Name Button (if it uses team1 color)
+            if (confirmNameBtn && teamNumber === 1) { 
+                 confirmNameBtn.style.backgroundColor = newColor;
+            }
+            
+            // 9. Update the Color Picker Modal's "Close" button color if it's visible and for the current team
+            if (!isInitialSetup && colorPickerModal && colorPickerModal.classList.contains('visible') && currentEditingTeamForColor === teamNumber) {
+                if (closeColorPickerBtn) {
+                    closeColorPickerBtn.style.backgroundColor = newColor;
+                }
+            }
         }
 
 
@@ -1085,15 +1286,14 @@
         }
 
         function checkWinCondition() {
-            // This function checks for a win, increments the score, updates the display, and announces the winner.
             if (checkForPath(team1Class, 'row')) { 
-                team1Score++; // Score for Team 1 is incremented
-                updateScoreDisplay(); // Display is updated with the new score
+                team1Score++; 
+                updateScoreDisplay(); 
                 announceWinner("الفريق الأول فاز!", team1Class); return;
             }
             if (checkForPath(team2Class, 'col')) { 
-                team2Score++; // Score for Team 2 is incremented
-                updateScoreDisplay(); // Display is updated with the new score
+                team2Score++; 
+                updateScoreDisplay(); 
                 announceWinner("الفريق الثاني فاز!", team2Class); return;
             }
         }
@@ -1163,8 +1363,11 @@
         function updateGridBackground() {
             const gridBg = document.getElementById('grid-background');
             if(gridBg) {
+                // Ensure CSS variables are correctly fetched for the gradient
+                const colorTeam1 = getComputedStyle(document.documentElement).getPropertyValue('--color-team1').trim();
+                const colorTeam2 = getComputedStyle(document.documentElement).getPropertyValue('--color-team2').trim();
                 gridBg.style.background = `
-                    conic-gradient(from 45deg at 50% 50%, var(--color-team2) 0deg 90deg, var(--color-team1) 90deg 180deg, var(--color-team2) 180deg 270deg, var(--color-team1) 270deg 360deg)
+                    conic-gradient(from 45deg at 50% 50%, ${colorTeam2} 0deg 90deg, ${colorTeam1} 90deg 180deg, ${colorTeam2} 180deg 270deg, ${colorTeam1} 270deg 360deg)
                 `;
             }
         }
@@ -1172,7 +1375,6 @@
         if(restartButton) restartButton.addEventListener('click', () => {
             if(winOverlay) winOverlay.classList.remove('visible'); 
             if (titleAnimationIntervalId) { clearInterval(titleAnimationIntervalId); titleAnimationIntervalId = null; }
-            // Scores are NOT reset here, they persist through restart
             initialize(); 
         });
 
@@ -1181,10 +1383,15 @@
             tempTextArea.value = copyTextValue;
             document.body.appendChild(tempTextArea);
             tempTextArea.select();
-            document.execCommand('copy');
+            try {
+                 document.execCommand('copy');
+                 if(copyMessage) copyMessage.classList.add('visible');
+                 setTimeout(() => { if(copyMessage) copyMessage.classList.remove('visible'); }, 2000); 
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                // Optionally, inform the user that copy failed
+            }
             document.body.removeChild(tempTextArea);
-            if(copyMessage) copyMessage.classList.add('visible');
-            setTimeout(() => { if(copyMessage) copyMessage.classList.remove('visible'); }, 2000); 
             window.open(questionsWebsiteUrl, "_blank");
         });
     </script>
