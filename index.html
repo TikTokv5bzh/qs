@@ -41,7 +41,6 @@
             --color-modal-close-button-bg: #6B7280; /* Neutral color for close button */
             --color-modal-close-button-hover-bg: #4B5563;
 
-
             /* --- الأبعاد الأساسية للشكل السداسي --- */
             --hex-width: 85px;
             --hex-height: calc(var(--hex-width) * 0.8660254); /* 0.8660254 is approx sqrt(3)/2 */
@@ -51,7 +50,6 @@
             --hex-margin-h: calc(var(--hex-width) * -0.134); 
             --hex-margin-v-overlap: calc(var(--hex-height) * -0.25); 
             --hex-stagger-offset: calc(var(--hex-width) * (1 - 0.134*2) / 2); 
-
 
             --container-padding: 20px; 
 
@@ -67,7 +65,6 @@
             --grid-size-option-hex-height: calc(var(--grid-size-option-hex-width) * 0.8660254);
             --modal-hex-option-margin-h: calc(var(--grid-size-option-hex-width) * -0.134);
             --modal-hex-option-margin-v-overlap: calc(var(--grid-size-option-hex-height) * -0.25);
-
         }
         *, *::before, *::after { box-sizing: border-box; }
 
@@ -247,11 +244,27 @@
             gap: 15px; 
             width: 100%; margin-top: 25px; margin-bottom: 15px; padding: 0 10px; 
         }
-        #action-button-area, #grid-size-control-area { 
+        /* Adjusted order for buttons */
+        #action-button-area {
+            order: 1; /* Questions button group */
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        #grid-size-control-area { /* Moved to order 2 */
+            order: 2; /* Grid size button */
             display: flex; 
             justify-content: center;
             position: relative; 
         }
+        #toggleParticipantsButtonWrapper { /* Moved to order 3 */
+            order: 3; /* Participants button */
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+
         .action-button-style {
             padding: 10px 15px; background-color: #4CAF50; color: white; border: none;
             border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease;
@@ -338,6 +351,111 @@
         #color-picker-modal .modal-content {
             max-width: 380px; /* Adjusted for color picker layout */
         }
+        /* Styles for the participants iframe container (fixed side panel) */
+        #participants-iframe-wrapper {
+            position: fixed;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%) scale(0.8); /* Start smaller and centered */
+            width: 350px; /* Square-like width */
+            height: 400px; /* Square-like height */
+            background-color: transparent; /* Changed to transparent */
+            padding: 15px;
+            border-radius: 0; /* Changed to 0 */
+            box-shadow: none; /* Changed to none */
+            z-index: 1000; /* Ensure it's above other game elements */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+            display: flex; /* Use flex for content alignment */
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Align content to top */
+            text-align: center; /* Center text */
+            cursor: grab; /* Indicate it's draggable */
+            min-width: 200px; /* Minimum size for resizing */
+            min-height: 200px; /* Minimum size for resizing */
+        }
+
+        #participants-iframe-wrapper.visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1); /* Scale up to normal size */
+        }
+
+        #participants-iframe-wrapper h3 { /* This h3 is now removed, but keeping for reference if user changes mind */
+            font-size: 1.5rem; 
+            color: var(--color-text-dark);
+            margin-bottom: 15px;
+            font-weight: bold;
+            width: 100%; 
+            padding: 5px 0;
+            cursor: grab; 
+        }
+
+        #participantsIframe { /* ID change for the iframe */
+            width: 100%;
+            height: 100%; /* Iframe will take 100% of wrapper's content area */
+            border: 2px solid var(--color-team1); /* Keep border on iframe itself for visibility */
+            border-radius: 8px;
+            margin-bottom: 0; 
+        }
+
+        /* Resize Handles */
+        .resize-handle {
+            position: absolute;
+            background: transparent; /* Transparent background */
+            border: none; /* No border */
+            z-index: 10; /* Above iframe but below parent wrapper */
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.2s ease;
+        }
+
+        #participants-iframe-wrapper:hover .resize-handle {
+            opacity: 1; /* Show handles on hover */
+        }
+        /* Make handles visible when dragging/resizing */
+        #participants-iframe-wrapper.dragging .resize-handle,
+        #participants-iframe-wrapper.resizing .resize-handle {
+            opacity: 1;
+        }
+
+
+        .resize-handle.n, .resize-handle.s {
+            height: 8px;
+            left: 10px;
+            right: 10px;
+            cursor: ns-resize;
+        }
+        .resize-handle.e, .resize-handle.w {
+            width: 8px;
+            top: 10px;
+            bottom: 10px;
+            cursor: ew-resize;
+        }
+        .resize-handle.nw, .resize-handle.ne, .resize-handle.sw, .resize-handle.se {
+            width: 12px;
+            height: 12px;
+            background: transparent; /* Transparent corners */
+            border-radius: 50%;
+        }
+        /* Visual cue for invisible handles */
+        .resize-handle:hover {
+            outline: 1px dashed rgba(255, 255, 255, 0.7); /* Subtle dashed border on hover */
+        }
+
+
+        .resize-handle.n { top: 0; }
+        .resize-handle.s { bottom: 0; }
+        .resize-handle.e { right: 0; }
+        .resize-handle.w { left: 0; }
+        .resize-handle.nw { top: 0; left: 0; cursor: nwse-resize; }
+        .resize-handle.ne { top: 0; right: 0; cursor: nesw-resize; }
+        .resize-handle.sw { bottom: 0; left: 0; cursor: nesw-resize; }
+        .resize-handle.se { bottom: 0; right: 0; cursor: nwse-resize; }
+
 
         .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); opacity: 1;}
 
@@ -501,7 +619,7 @@
         @media (min-width: 768px) { 
             .game-layout-row {
                 flex-direction: row; 
-                align-items: center; 
+                align-items: flex-start; /* Align items to the top in horizontal layout */
                 justify-content: center; 
                 gap: 10px; 
             }
@@ -514,10 +632,7 @@
                 align-items: center; 
                 align-self: center; 
             }
-            #grid-layout-container {
-                order: 2; 
-                align-self: center; 
-            }
+
             #header-content-wrapper { 
                 display: grid; 
                 grid-template-areas: 
@@ -535,28 +650,38 @@
             #game-title-text-wrapper { grid-area: title; margin:0; } 
 
             :root {
-                 --score-hex-width: 55px; 
-                 --hex-width: 75px;
-                 --grid-size-hex-width: 70px;
-                 --grid-size-option-hex-width: 45px;
+                --score-hex-width: 55px; 
+                --hex-width: 75px;
+                --grid-size-hex-width: 70px;
+                --grid-size-option-hex-width: 45px;
             }
             #title-line-1 { font-size: 3.2rem; } 
             #title-line-2 { font-size: 2.2rem; } 
             #title-line-3 { font-size: 3.2rem; }
             .win-message-text { font-size: 4rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.4); }
+
+            /* Responsive adjustments for iframe container */
+            #participants-iframe-wrapper {
+                width: 350px; /* A bit larger */
+                height: 400px; /* A bit taller */
+            }
         }
         
         @media (max-width: 900px) and (min-width: 768px) { 
              :root {
-                 --score-hex-width: 50px; 
-                 --hex-width: 70px;
-                 --grid-size-hex-width: 65px;
-                 --grid-size-option-hex-width: 42px;
+                --score-hex-width: 50px; 
+                --hex-width: 70px;
+                --grid-size-hex-width: 65px;
+                --grid-size-option-hex-width: 42px;
             }
             #title-line-1 { font-size: 3rem; } 
             #title-line-2 { font-size: 2rem; } 
             #title-line-3 { font-size: 3rem; }
+            #participants-iframe-wrapper {
+                width: 300px;
+                height: 350px;
+            }
         }
 
         @media (max-width: 767.98px) { 
@@ -579,6 +704,19 @@
             .win-message-text { font-size: 2.8rem; }
             #grid-size-button { font-size: calc(var(--grid-size-hex-width) * 0.38); }
             #color-picker-modal .modal-content { max-width: 320px; }
+
+            /* Adjust participants iframe wrapper for smaller screens */
+            #participants-iframe-wrapper {
+                top: 20px; /* From top */
+                left: 50%; /* Center horizontally */
+                transform: translateX(-50%) translateY(0); /* Start visible at top center */
+                width: 90%; /* Take more width */
+                height: 400px; /* Maintain height */
+                cursor: grab; /* Still draggable */
+            }
+            #participants-iframe-wrapper.visible {
+                transform: translateX(-50%) translateY(0) scale(1); /* No change in position if visible */
+            }
         }
         @media (max-width: 550px) { 
             body { display: block; padding-top: 15px; } 
@@ -604,6 +742,10 @@
             .predefined-color-swatch { width: 30px; height: 30px; }
             #custom-color-preview { width: 50px; height: 50px; }
 
+            #participants-iframe-wrapper {
+                width: 95%; /* Even more width on very small screens */
+                height: 300px; /* Smaller height */
+            }
         }
     </style>
 </head>
@@ -647,9 +789,10 @@
         </div>
         
         <div id="page-controls-container">
+            <!-- First button: Questions -->
             <div id="action-button-area"> 
                 <div class="button-with-message-wrapper">
-                    <button id="copyAndNavigateButton" class="action-button-style">
+                    <button id="questionsButton" class="action-button-style">
                         <i class="far fa-copy"></i>
                         <i class="fas fa-external-link-alt"></i>
                         <span>الأسئلة</span> 
@@ -657,8 +800,16 @@
                     <span id="copyMessage" class="copy-message">تم النسخ!</span>
                 </div>
             </div>
+            <!-- Second button: Grid size control -->
             <div id="grid-size-control-area">
                 <div id="grid-size-button" title="تغيير حجم الشبكة">6</div>
+            </div>
+            <!-- Third button: First to Press (toggle participants) -->
+            <div id="toggleParticipantsButtonWrapper">
+                <button id="toggleParticipantsButton" class="action-button-style mr-2">
+                    <i class="fas fa-hand-pointer"></i> <!-- Changed icon -->
+                    <span>اول من يضغط الزر</span> <!-- Changed text -->
+                </button>
             </div>
         </div>
     </div>
@@ -710,6 +861,21 @@
         </div>
     </div>
 
+    <!-- Participants Iframe Wrapper (draggable and resizable) -->
+    <div id="participants-iframe-wrapper">
+        <!-- Removed h3 title here -->
+        <iframe id="participantsIframe" src="https://script.google.com/macros/s/AKfycbzzjpqVDzJAkcNbHrZV7zO-7ncu013YoHteORrdl7Uy64DMmDdyf16E7hjEiw0P5BLX/exec" frameborder="0"></iframe>
+        
+        <!-- Resize Handles -->
+        <div class="resize-handle n"></div>
+        <div class="resize-handle s"></div>
+        <div class="resize-handle e"></div>
+        <div class="resize-handle w"></div>
+        <div class="resize-handle nw"></div>
+        <div class="resize-handle ne"></div>
+        <div class="resize-handle sw"></div>
+        <div class="resize-handle se"></div>
+    </div>
 
     <script>
         // --- Configuration ---
@@ -747,7 +913,7 @@
         const winMessageText = document.getElementById('winMessageText');
         const restartButton = document.getElementById('restartButton');
         const titleLine3 = document.getElementById('title-line-3');
-        const copyAndNavigateButton = document.getElementById('copyAndNavigateButton');
+        const questionsButton = document.getElementById('questionsButton'); 
         const copyMessage = document.getElementById('copyMessage');
         
         const nameInputModal = document.getElementById('name-input-modal');
@@ -777,6 +943,31 @@
         const customColorPreview = document.getElementById('custom-color-preview');
         const closeColorPickerBtn = document.getElementById('closeColorPickerBtn');
 
+        // Participants Iframe Elements
+        const participantsIframeWrapper = document.getElementById('participants-iframe-wrapper'); 
+        const participantsIframe = document.getElementById('participantsIframe'); 
+        const toggleParticipantsButton = document.getElementById('toggleParticipantsButton'); 
+        // participantsIframeTitle is removed, so no direct reference needed for element, but logic for drag will move to wrapper.
+
+        // Draggable State Variables
+        let isDragging = false;
+        let dragInitialMouseX, dragInitialMouseY;
+        let dragInitialWrapperX, dragInitialWrapperY; // Store actual pixel position of wrapper
+
+        // Resizable State Variables
+        let isResizing = false;
+        let resizeHandleType = ''; // 'n', 's', 'e', 'w', 'nw', 'ne', 'sw', 'se'
+        let resizeInitialMouseX, resizeInitialMouseY;
+        let resizeInitialWrapperWidth, resizeInitialWrapperHeight;
+        let resizeInitialWrapperX, resizeInitialWrapperY; // Store actual pixel position of wrapper
+
+        // Min dimensions for resizable window
+        const MIN_IFRAME_WIDTH = 250; // px
+        const MIN_IFRAME_HEIGHT = 300; // px
+
+        // Constant for participants iframe URL
+        const PARTICIPANTS_IFRAME_URL = "https://script.google.com/macros/s/AKfycbzzjpqVDzJAkcNbHrZV7zO-7ncu013YoHteORrdl7Uy64DMmDdyf16E7hjEiw0P5BLX/exec";
+
 
         window.addEventListener('load', initialize);
 
@@ -798,6 +989,7 @@
             if(nameInputModal) nameInputModal.classList.remove('visible'); 
             if(gridSizeModal) gridSizeModal.classList.remove('visible'); 
             if(colorPickerModal) colorPickerModal.classList.remove('visible');
+            if(participantsIframeWrapper) participantsIframeWrapper.classList.remove('visible'); // Hide iframe on init
             gameIsOver = false;
             
             updateScoreDisplay(); 
@@ -840,6 +1032,8 @@
             
             setupColorPickers(); 
             setupGridSizeControls(); 
+            setupIframeControls(); // Setup iframe controls
+            setupIframeResizeHandles(); // Setup resize handles
 
             showLoading(false); 
             startTitleAnimation(); 
@@ -1362,7 +1556,7 @@
             initialize(); 
         });
 
-        if(copyAndNavigateButton) copyAndNavigateButton.addEventListener('click', () => {
+        if(questionsButton) questionsButton.addEventListener('click', () => {
             const tempTextArea = document.createElement('textarea');
             tempTextArea.value = copyTextValue;
             document.body.appendChild(tempTextArea);
@@ -1377,6 +1571,202 @@
             document.body.removeChild(tempTextArea);
             window.open(questionsWebsiteUrl, "_blank");
         });
+
+        // --- Iframe Controls (fixed draggable and resizable modal) ---
+        function setupIframeControls() {
+            if (toggleParticipantsButton && participantsIframeWrapper) {
+                toggleParticipantsButton.addEventListener('click', () => {
+                    participantsIframeWrapper.classList.toggle('visible');
+                    // Reset position if showing for the first time or if it was off-screen
+                    if (participantsIframeWrapper.classList.contains('visible')) {
+                        // Set initial position to center of screen relative to viewport
+                        const viewportWidth = window.innerWidth;
+                        const viewportHeight = window.innerHeight;
+                        const wrapperWidth = participantsIframeWrapper.offsetWidth;
+                        const wrapperHeight = participantsIframeWrapper.offsetHeight;
+
+                        participantsIframeWrapper.style.left = ((viewportWidth - wrapperWidth) / 2) + 'px';
+                        participantsIframeWrapper.style.top = ((viewportHeight - wrapperHeight) / 2) + 'px';
+                        participantsIframeWrapper.style.transform = 'none'; // Crucial: remove transform for direct positioning
+
+                        // Also trigger the share link action
+                        shareParticipantsLink();
+                    }
+                });
+            }
+
+            // Draggable functionality
+            // Now, the entire participantsIframeWrapper is draggable
+            if (participantsIframeWrapper) { 
+                participantsIframeWrapper.addEventListener('mousedown', (e) => {
+                    // Only start dragging if not on a resize handle
+                    if (e.target.classList.contains('resize-handle')) {
+                        return; 
+                    }
+                    isDragging = true;
+                    participantsIframeWrapper.classList.add('dragging'); // Add dragging class for visual cue
+                    
+                    const rect = participantsIframeWrapper.getBoundingClientRect();
+                    dragInitialMouseX = e.clientX;
+                    dragInitialMouseY = e.clientY;
+                    dragInitialWrapperX = rect.left;
+                    dragInitialWrapperY = rect.top;
+
+                    // Temporarily disable pointer events on iframe to allow mousemove on wrapper
+                    participantsIframe.style.pointerEvents = 'none';
+
+                    document.addEventListener('mousemove', onDragMouseMove);
+                    document.addEventListener('mouseup', onDragOrResizeMouseUp); // Use a single mouseup handler
+                    e.preventDefault();
+                });
+            }
+
+            function onDragMouseMove(e) {
+                if (!isDragging) return;
+
+                let newLeft = dragInitialWrapperX + (e.clientX - dragInitialMouseX);
+                let newTop = dragInitialWrapperY + (e.clientY - dragInitialMouseY);
+
+                // Keep within viewport boundaries
+                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - participantsIframeWrapper.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, window.innerHeight - participantsIframeWrapper.offsetHeight));
+
+                participantsIframeWrapper.style.left = newLeft + 'px';
+                participantsIframeWrapper.style.top = newTop + 'px';
+                participantsIframeWrapper.style.transform = 'none'; // Ensure transform is off during direct positioning
+            }
+
+            // Consolidated mouseup handler for both drag and resize
+            function onDragOrResizeMouseUp() {
+                isDragging = false;
+                isResizing = false;
+                participantsIframeWrapper.classList.remove('dragging', 'resizing'); // Remove dragging/resizing classes
+                participantsIframe.style.pointerEvents = 'auto'; // Re-enable pointer events for iframe
+                document.removeEventListener('mousemove', onDragMouseMove); // Remove specific dragging listener
+                document.removeEventListener('mousemove', onResizeMouseMove); // Remove specific resizing listener
+                document.removeEventListener('mouseup', onDragOrResizeMouseUp);
+            }
+        }
+
+        // --- Iframe Resizable Controls ---
+        function setupIframeResizeHandles() {
+            const handles = document.querySelectorAll('#participants-iframe-wrapper .resize-handle'); // Select handles specifically within the wrapper
+            handles.forEach(handle => {
+                handle.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    participantsIframeWrapper.classList.add('resizing'); // Add resizing class for visual cue
+                    resizeHandleType = e.target.classList[1]; // e.g., 'n', 'se'
+                    
+                    const rect = participantsIframeWrapper.getBoundingClientRect();
+                    initialWidth = rect.width;
+                    initialHeight = rect.height;
+                    resizeInitialMouseX = e.clientX; // Store initial mouse position for calculating delta
+                    resizeInitialMouseY = e.clientY;
+                    
+                    // Capture initial iframe position to adjust when resizing from top/left
+                    resizeInitialWrapperX = rect.left;
+                    resizeInitialWrapperY = rect.top;
+
+                    participantsIframe.style.pointerEvents = 'none'; // Disable iframe events during resize
+                    document.addEventListener('mousemove', onResizeMouseMove);
+                    document.addEventListener('mouseup', onDragOrResizeMouseUp);
+                    e.preventDefault(); // Prevent text selection etc.
+                });
+            });
+
+            function onResizeMouseMove(e) {
+                if (!isResizing) return;
+
+                let newWidth = initialWidth;
+                let newHeight = initialHeight;
+                let newLeft = resizeInitialWrapperX;
+                let newTop = resizeInitialWrapperY;
+                
+                const deltaX = e.clientX - resizeInitialMouseX;
+                const deltaY = e.clientY - resizeInitialMouseY;
+
+                // Apply resizing based on handle type
+                // Reset transform to none before applying new top/left/width/height to avoid conflicts
+                participantsIframeWrapper.style.transform = 'none';
+
+                if (resizeHandleType.includes('e')) { // East (right)
+                    newWidth = initialWidth + deltaX;
+                }
+                if (resizeHandleType.includes('s')) { // South (bottom)
+                    newHeight = initialHeight + deltaY;
+                }
+                if (resizeHandleType.includes('w')) { // West (left)
+                    newWidth = initialWidth - deltaX;
+                    newLeft = resizeInitialWrapperX + deltaX;
+                }
+                if (resizeHandleType.includes('n')) { // North (top)
+                    newHeight = initialHeight - deltaY;
+                    newTop = resizeInitialWrapperY + deltaY;
+                }
+
+                // Apply new dimensions, respecting minimums
+                participantsIframeWrapper.style.width = Math.max(newWidth, MIN_IFRAME_WIDTH) + 'px';
+                participantsIframeWrapper.style.height = Math.max(newHeight, MIN_IFRAME_HEIGHT) + 'px';
+
+                // Update position if resizing from top/left
+                if (resizeHandleType.includes('n') || resizeHandleType.includes('w')) {
+                    // Make sure the element does not go off-screen when resizing from top/left
+                    participantsIframeWrapper.style.left = Math.max(0, Math.min(newLeft, window.innerWidth - participantsIframeWrapper.offsetWidth)) + 'px';
+                    participantsIframeWrapper.style.top = Math.max(0, Math.min(newTop, window.innerHeight - participantsIframeWrapper.offsetHeight)) + 'px';
+                }
+            }
+        }
+
+        // Function to handle sharing participants link
+        function shareParticipantsLink() {
+            const urlToShare = PARTICIPANTS_IFRAME_URL;
+
+            // Check if the Web Share API is available
+            if (navigator.share) {
+                navigator.share({
+                    title: 'رابط المشاركين في لعبة الحروف',
+                    url: urlToShare,
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                }).catch(console.error);
+            } else {
+                // Fallback for browsers that do not support Web Share API
+                // Copy to clipboard
+                const tempInput = document.createElement('input');
+                tempInput.value = urlToShare;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                // Provide a visual cue that link is copied
+                const messageSpan = document.createElement('span');
+                messageSpan.textContent = 'تم نسخ الرابط!';
+                messageSpan.style.cssText = `
+                    position: fixed;
+                    bottom: 80px; /* Adjust position as needed */
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 8px 15px;
+                    border-radius: 5px;
+                    z-index: 9999;
+                    opacity: 0;
+                    transition: opacity 0.3s ease-in-out;
+                `;
+                document.body.appendChild(messageSpan);
+                setTimeout(() => {
+                    messageSpan.style.opacity = '1';
+                }, 10); // Small delay to trigger transition
+                setTimeout(() => {
+                    messageSpan.style.opacity = '0';
+                    messageSpan.addEventListener('transitionend', () => messageSpan.remove(), {once: true});
+                }, 2000); // Hide after 2 seconds
+            }
+        }
+
+        // Call the setupShareButton function during initialization (no longer needed, integrated into setupIframeControls)
+        // window.addEventListener('load', setupShareButton); // Removed
     </script>
 </body>
 </html>
